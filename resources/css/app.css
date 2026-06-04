@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Scrollbar for a Premium Dark UI */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #030712; 
+}
+::-webkit-scrollbar-thumb {
+    background: #3730a3; /* Indigo-800 */
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #4f46e5; /* Indigo-600 */
+}
+
+/* Inertia NProgress (Page Loading Bar) Overrides */
+#nprogress .bar {
+    background: linear-gradient(to right, #818cf8, #c084fc, #f472b6) !important;
+    height: 3px !important;
+    box-shadow: 0 0 10px rgba(99,102,241,0.5) !important;
+}
+#nprogress .peg {
+    box-shadow: 0 0 10px #c084fc, 0 0 5px #c084fc !important;
+}
