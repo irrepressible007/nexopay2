@@ -51,6 +51,10 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(
     Route::post('/checkin', [\App\Http\Controllers\Admin\CheckInController::class, 'process'])->name('checkin.process');
     
     Route::resource('pages', \App\Http\Controllers\Admin\PageController::class)->except('show');
+    
+    Route::get('/analytics', [\App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('analytics.index');
+    Route::get('/analytics/export/summary', [\App\Http\Controllers\Admin\AnalyticsController::class, 'exportSummary'])->name('analytics.export.summary');
+    Route::get('/analytics/export/detailed', [\App\Http\Controllers\Admin\AnalyticsController::class, 'exportDetailed'])->name('analytics.export.detailed');
 });
 
 Route::get('/p/{slug}', [\App\Http\Controllers\PublicPageController::class, 'show'])->name('page.show');

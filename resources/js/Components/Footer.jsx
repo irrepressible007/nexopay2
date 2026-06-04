@@ -17,7 +17,7 @@ export default function Footer() {
                     <div>
                         <Link href="/">
                             {siteSettings.navbar_logo ? (
-                                <img src={siteSettings.navbar_logo} alt="Logo" className="h-10 object-contain mb-6" />
+                                <img src={siteSettings.navbar_logo} onError={(e) => { e.target.onerror = null; e.target.src = '/logo/nexopay-new-logo.png'; }} alt="Logo" className="h-10 object-contain mb-6" />
                             ) : (
                                 <div className="text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mb-6 uppercase">
                                     {siteSettings.app_name || 'NEXOPAY'}

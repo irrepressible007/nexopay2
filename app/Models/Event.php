@@ -25,6 +25,7 @@ class Event extends Model
         'segments',
         'gallery_images',
         'has_base_price',
+        'require_login',
     ];
 
     protected function casts(): array
@@ -36,6 +37,7 @@ class Event extends Model
             'segments' => 'array',
             'gallery_images' => 'array',
             'has_base_price' => 'boolean',
+            'require_login' => 'boolean',
         ];
     }
 

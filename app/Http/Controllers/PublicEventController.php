@@ -55,12 +55,23 @@ class PublicEventController extends Controller
 
     public function register(Request $request, Event $event)
     {
-        $request->validate([
+        if ($event->require_login && !auth()->check()) {
+            return redirect()->route('login')->with('error', 'You must be logged in to register for this event.');
+        }
+
+        $rules = [
             'role' => 'required|string',
             'bkash_txid' => 'required|string|unique:registrations,bkash_txid',
             'form_data' => 'nullable|array',
             'selected_segments' => 'nullable|array',
-        ]);
+        ];
+
+        if (!$event->require_login && !auth()->check()) {
+            $rules['guest_name'] = 'required|string|max:255';
+            $rules['guest_email'] = 'required|email|max:255';
+        }
+
+        $request->validate($rules);
 
         $role = Role::firstOrCreate([
             'name' => $request->role,
@@ -110,13 +121,17 @@ class PublicEventController extends Controller
             }
         }
 
-        // Smart auto-fill logic
+        // Smart auto-fill logic for logged in users
         $user = auth()->user();
-        $updatedProfile = array_merge((array) $user->profile_data, (array) $request->form_data);
-        $user->update(['profile_data' => $updatedProfile]);
+        if ($user) {
+            $updatedProfile = array_merge((array) $user->profile_data, (array) $request->form_data);
+            $user->update(['profile_data' => $updatedProfile]);
+        }
 
         Registration::create([
-            'user_id' => $user->id,
+            'user_id' => $user ? $user->id : null,
+            'guest_name' => $request->guest_name,
+            'guest_email' => $request->guest_email,
             'event_id' => $event->id,
             'role_id' => $role->id,
             'bkash_txid' => $request->bkash_txid,
@@ -125,6 +140,10 @@ class PublicEventController extends Controller
             'selected_segments' => $selectedSegments,
             'payable_amount' => $total,
         ]);
+
+        if (!$user) {
+            return redirect()->route('home')->with('success', 'Registration submitted! You will receive a confirmation email once approved.');
+        }
 
         return redirect()->route('dashboard')->with('success', 'Registration submitted and pending Finance approval.');
     }

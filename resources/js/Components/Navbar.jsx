@@ -18,7 +18,7 @@ export default function Navbar() {
                         <div className="flex shrink-0 items-center">
                             <Link href="/">
                                 {siteSettings.navbar_logo ? (
-                                    <img src={siteSettings.navbar_logo} alt="Logo" className="h-16 object-contain py-2" />
+                                    <img src={siteSettings.navbar_logo} onError={(e) => { e.target.onerror = null; e.target.src = '/logo/nexopay-new-logo.png'; }} alt="Logo" className="h-16 object-contain py-2" />
                                 ) : (
                                     <div className="text-xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 uppercase">
                                         {siteSettings.app_name || 'NEXOPAY'}
@@ -82,6 +82,9 @@ export default function Navbar() {
                                                 <Dropdown.Link href={route('admin.partners.index')}>Partners</Dropdown.Link>
                                                 <Dropdown.Link href={route('admin.pages.index')}>CMS Pages</Dropdown.Link>
                                                 <Dropdown.Link href={route('admin.checkin.index')}>QR Check-in</Dropdown.Link>
+                                                {route().has('admin.analytics.index') && (
+                                                    <Dropdown.Link href={route('admin.analytics.index')}>Analytics & Reports</Dropdown.Link>
+                                                )}
                                                 <Dropdown.Link href={route('admin.settings.index')}>Site Settings</Dropdown.Link>
                                             </>
                                         )}
@@ -137,6 +140,9 @@ export default function Navbar() {
                                                 <ResponsiveNavLink href={route('admin.partners.index')}>Partners</ResponsiveNavLink>
                                                 <ResponsiveNavLink href={route('admin.pages.index')}>CMS Pages</ResponsiveNavLink>
                                                 <ResponsiveNavLink href={route('admin.checkin.index')}>QR Check-in</ResponsiveNavLink>
+                                                {route().has('admin.analytics.index') && (
+                                                    <ResponsiveNavLink href={route('admin.analytics.index')}>Analytics & Reports</ResponsiveNavLink>
+                                                )}
                                                 <ResponsiveNavLink href={route('admin.settings.index')}>Site Settings</ResponsiveNavLink>
                                             </>
                                         )}

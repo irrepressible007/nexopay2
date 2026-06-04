@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Registration;
-use App\Mail\PremiumTicketMail;
+use App\Mail\RegistrationConfirmed;
 use App\Mail\RegistrationRejectedMail;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -37,8 +37,11 @@ class FinanceController extends Controller
             'qr_uuid' => (string) Str::uuid()
         ]);
 
-        // Trigger Resend Email for Premium Ticket
-        Mail::to($registration->user->email)->send(new PremiumTicketMail($registration));
+        // Trigger Resend Email
+        $recipientEmail = $registration->user ? $registration->user->email : $registration->guest_email;
+        if ($recipientEmail) {
+            Mail::to($recipientEmail)->send(new RegistrationConfirmed($registration));
+        }
 
         return back()->with('success', 'Registration approved and ticket sent!');
     }
@@ -55,7 +58,10 @@ class FinanceController extends Controller
         ]);
 
         // Trigger Resend Email for Rejection
-        Mail::to($registration->user->email)->send(new RegistrationRejectedMail($registration));
+        $recipientEmail = $registration->user ? $registration->user->email : $registration->guest_email;
+        if ($recipientEmail) {
+            Mail::to($recipientEmail)->send(new RegistrationRejectedMail($registration));
+        }
 
         return back()->with('success', 'Registration rejected and user notified.');
     }
@@ -88,8 +94,8 @@ class FinanceController extends Controller
             foreach ($registrations as $reg) {
                 fputcsv($file, [
                     $reg->id,
-                    $reg->user->name,
-                    $reg->user->email,
+                    $reg->user ? $reg->user->name : $reg->guest_name . ' (Guest)',
+                    $reg->user ? $reg->user->email : $reg->guest_email,
                     $reg->event->title,
                     $reg->role->name,
                     $reg->bkash_txid,

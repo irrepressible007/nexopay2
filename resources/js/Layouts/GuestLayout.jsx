@@ -12,7 +12,7 @@ export default function GuestLayout({ children }) {
             <div className="z-10 text-center mb-8">
                 <Link href="/">
                     {siteSettings.navbar_logo ? (
-                        <img src={siteSettings.navbar_logo} alt="Logo" className="h-16 object-contain mx-auto" />
+                        <img src={siteSettings.navbar_logo} onError={(e) => { e.target.onerror = null; e.target.src = '/logo/nexopay-new-logo.png'; }} alt="Logo" className="h-16 object-contain mx-auto" />
                     ) : (
                         <div className="text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 uppercase">
                             {siteSettings.app_name || 'NEXOPAY'}
