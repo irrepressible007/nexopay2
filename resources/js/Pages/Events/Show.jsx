@@ -74,12 +74,14 @@ export default function Show({ auth, event }) {
         segments.forEach(seg => {
             const selection = selectedSegments[seg.id];
             if (!selection) return;
-            if (seg.pricing_mode === 'global' && selection === true) {
-                total += Number(seg.global_price || 0);
+            if (seg.pricing_mode === 'global') {
+                if (selection === true || (Array.isArray(selection) && selection.length > 0) || (typeof selection === 'string' && selection.length > 0)) {
+                    total += Number(seg.global_price || 0);
+                }
             } else if (seg.pricing_mode !== 'global') {
                 const subIds = Array.isArray(selection) ? selection : [selection];
                 subIds.forEach(subId => {
-                    const sub = seg.sub_segments.find(s => s.id === subId);
+                    const sub = (seg.sub_segments || []).find(s => s.id === subId);
                     if (sub) total += Number(sub.price || 0);
                 });
             }
@@ -354,7 +356,7 @@ export default function Show({ auth, event }) {
                                                                     {seg.pricing_mode === 'global' && <div className="font-black text-indigo-400 text-xl bg-indigo-500/10 px-4 py-1.5 rounded-lg border border-indigo-500/20">৳{seg.global_price}</div>}
                                                                 </div>
 
-                                                                {seg.pricing_mode === 'global' ? (
+                                                                {!seg.sub_segments || seg.sub_segments.length === 0 ? (
                                                                     <label className="flex items-center space-x-4 cursor-pointer p-5 border border-gray-700 rounded-xl hover:bg-gray-800/50 transition">
                                                                         <input
                                                                             type="checkbox"
@@ -384,7 +386,9 @@ export default function Show({ auth, event }) {
                                                                                         />
                                                                                         <span className="font-semibold text-gray-200">{sub.title}</span>
                                                                                     </div>
-                                                                                    <span className="font-black text-indigo-400">৳{sub.price}</span>
+                                                                                    {seg.pricing_mode === 'sub_segment' && (
+                                                                                        <span className="font-black text-indigo-400">৳{sub.price}</span>
+                                                                                    )}
                                                                                 </label>
                                                                             )
                                                                         })}
