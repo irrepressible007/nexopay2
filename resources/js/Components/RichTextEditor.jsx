@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import ReactQuill, { Quill } from 'react-quill';
+import ReactQuill from 'react-quill';
+import Quill from 'quill';
 import 'react-quill/dist/quill.snow.css';
 
 // Register custom line height format
