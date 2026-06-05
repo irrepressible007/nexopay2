@@ -79,7 +79,7 @@ export default function Navbar() {
                                         {user.global_role === 'Admin' && (
                                             <>
                                                 <Dropdown.Link href={route('admin.dashboard')}>Events Dashboard</Dropdown.Link>
-                                                <Dropdown.Link href={route('finance.index')}>Finance & Registrations</Dropdown.Link>
+                                                <Dropdown.Link href={route('admin.finance.index')}>Finance & Registrations</Dropdown.Link>
                                                 <Dropdown.Link href={route('admin.partners.index')}>Partners</Dropdown.Link>
                                                 <Dropdown.Link href={route('admin.pages.index')}>CMS Pages</Dropdown.Link>
                                                 <Dropdown.Link href={route('admin.checkin.index')}>QR Check-in</Dropdown.Link>
@@ -138,7 +138,7 @@ export default function Navbar() {
                                         {user.global_role === 'Admin' && (
                                             <>
                                                 <ResponsiveNavLink href={route('admin.dashboard')}>Events Dashboard</ResponsiveNavLink>
-                                                <ResponsiveNavLink href={route('finance.index')}>Finance & Registrations</ResponsiveNavLink>
+                                                <ResponsiveNavLink href={route('admin.finance.index')}>Finance & Registrations</ResponsiveNavLink>
                                                 <ResponsiveNavLink href={route('admin.partners.index')}>Partners</ResponsiveNavLink>
                                                 <ResponsiveNavLink href={route('admin.pages.index')}>CMS Pages</ResponsiveNavLink>
                                                 <ResponsiveNavLink href={route('admin.checkin.index')}>QR Check-in</ResponsiveNavLink>
