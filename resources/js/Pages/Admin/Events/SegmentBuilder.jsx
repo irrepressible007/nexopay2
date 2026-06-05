@@ -18,36 +18,59 @@ export default function SegmentBuilder({ segments = [], setSegments, hasBasePric
     };
 
     const updateSegment = (index, key, value) => {
-        const newSegments = [...segments];
-        newSegments[index][key] = value;
+        const newSegments = segments.map((seg, i) => 
+            i === index ? { ...seg, [key]: value } : seg
+        );
         setSegments(newSegments);
     };
 
     const removeSegment = (index) => {
-        const newSegments = [...segments];
-        newSegments.splice(index, 1);
-        setSegments(newSegments);
+        setSegments(segments.filter((_, i) => i !== index));
     };
 
     const addSubSegment = (segIndex) => {
-        const newSegments = [...segments];
-        newSegments[segIndex].sub_segments.push({
-            id: `sub_${Date.now()}`,
-            title: '',
-            price: 0
+        const newSegments = segments.map((seg, i) => {
+            if (i === segIndex) {
+                return {
+                    ...seg,
+                    sub_segments: [
+                        ...(seg.sub_segments || []),
+                        {
+                            id: `sub_${Date.now()}`,
+                            title: '',
+                            price: 0
+                        }
+                    ]
+                };
+            }
+            return seg;
         });
         setSegments(newSegments);
     };
 
     const updateSubSegment = (segIndex, subIndex, key, value) => {
-        const newSegments = [...segments];
-        newSegments[segIndex].sub_segments[subIndex][key] = value;
+        const newSegments = segments.map((seg, i) => {
+            if (i === segIndex) {
+                const newSubs = (seg.sub_segments || []).map((sub, j) => 
+                    j === subIndex ? { ...sub, [key]: value } : sub
+                );
+                return { ...seg, sub_segments: newSubs };
+            }
+            return seg;
+        });
         setSegments(newSegments);
     };
 
     const removeSubSegment = (segIndex, subIndex) => {
-        const newSegments = [...segments];
-        newSegments[segIndex].sub_segments.splice(subIndex, 1);
+        const newSegments = segments.map((seg, i) => {
+            if (i === segIndex) {
+                return {
+                    ...seg,
+                    sub_segments: (seg.sub_segments || []).filter((_, j) => j !== subIndex)
+                };
+            }
+            return seg;
+        });
         setSegments(newSegments);
     };
 

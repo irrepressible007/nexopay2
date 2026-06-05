@@ -35,12 +35,13 @@ class EventController extends Controller
             'ca_price' => 'required|numeric|min:0',
             'volunteer_price' => 'required|numeric|min:0',
             'capacity' => 'nullable|integer|min:1',
-            'form_schema' => 'nullable|array',
-            'segments' => 'nullable|array',
             'has_base_price' => 'boolean',
             'gallery_images' => 'nullable|array',
             'gallery_images.*' => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048'
         ]);
+
+        $validated['segments'] = $request->input('segments', []);
+        $validated['form_schema'] = $request->input('form_schema', []);
 
         if ($request->hasFile('gallery_images')) {
             $images = [];
@@ -92,12 +93,13 @@ class EventController extends Controller
             'ca_price' => 'required|numeric|min:0',
             'volunteer_price' => 'required|numeric|min:0',
             'capacity' => 'nullable|integer|min:1',
-            'form_schema' => 'nullable|array',
-            'segments' => 'nullable|array',
             'has_base_price' => 'boolean',
             'gallery_images' => 'nullable|array',
             'gallery_images.*' => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048'
         ]);
+
+        $validated['segments'] = $request->input('segments', []);
+        $validated['form_schema'] = $request->input('form_schema', []);
 
         if ($request->hasFile('gallery_images')) {
             $images = [];
