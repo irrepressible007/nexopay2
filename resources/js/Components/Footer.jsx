@@ -24,9 +24,10 @@ export default function Footer() {
                                 </div>
                             )}
                         </Link>
-                        <p className="text-sm leading-relaxed max-w-sm">
-                            {siteSettings.footer_text || "The premium platform for managing events, registrations, and checking in attendees securely."}
-                        </p>
+                        <div 
+                            className="prose prose-invert prose-sm text-gray-400 mt-6 max-w-sm"
+                            dangerouslySetInnerHTML={{ __html: siteSettings.footer_text || "The premium platform for managing events, registrations, and checking in attendees securely." }}
+                        />
                     </div>
 
                     {/* Dynamic Links Section */}

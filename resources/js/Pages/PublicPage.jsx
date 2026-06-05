@@ -42,9 +42,10 @@ export default function PublicPage({ auth, page }) {
                                 <h1 className="text-5xl md:text-6xl font-black tracking-tight mb-8 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-blue-400 uppercase">
                                     Contact
                                 </h1>
-                                <p className="text-gray-400 font-medium tracking-wide uppercase text-sm mb-12 max-w-sm leading-relaxed">
-                                    {siteSettings.contact_subtitle || 'Secure line to Nexopay Command. Send us your brief, inquiry, or partnership request.'}
-                                </p>
+                                <div 
+                                    className="prose prose-invert prose-sm max-w-sm text-gray-400 font-medium tracking-wide leading-relaxed mb-12"
+                                    dangerouslySetInnerHTML={{ __html: (page.content && page.content !== '<p><br></p>') ? page.content : (siteSettings.contact_subtitle || 'Secure line to Nexopay Command. Send us your brief, inquiry, or partnership request.') }}
+                                />
 
                                 <div className="space-y-8">
                                     <div className="flex items-start gap-4">
