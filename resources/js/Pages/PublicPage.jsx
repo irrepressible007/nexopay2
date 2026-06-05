@@ -163,7 +163,7 @@ export default function PublicPage({ auth, page }) {
 
                             <div className="prose prose-invert prose-lg max-w-none prose-headings:text-white prose-a:text-indigo-400 hover:prose-a:text-indigo-300 prose-img:rounded-xl">
                                 <div className="whitespace-pre-wrap font-medium text-gray-300 leading-relaxed">
-                                    {page.content}
+                                    <div className="prose prose-invert max-w-none text-gray-300 leading-relaxed" dangerouslySetInnerHTML={{ __html: page.content || '' }} />
                                 </div>
                             </div>
                         </motion.div>

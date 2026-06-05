@@ -2,6 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ReactQuill Customizations */
+.ql-snow .ql-picker.ql-lineHeight {
+    width: 120px;
+}
+.ql-snow .ql-picker.ql-lineHeight .ql-picker-label::before {
+    content: 'Line Spacing';
+}
+.ql-snow .ql-picker.ql-lineHeight .ql-picker-label[data-value="1.0"]::before { content: 'Spacing: 1.0'; }
+.ql-snow .ql-picker.ql-lineHeight .ql-picker-label[data-value="1.5"]::before { content: 'Spacing: 1.5'; }
+.ql-snow .ql-picker.ql-lineHeight .ql-picker-label[data-value="2.0"]::before { content: 'Spacing: 2.0'; }
+.ql-snow .ql-picker.ql-lineHeight .ql-picker-label[data-value="2.5"]::before { content: 'Spacing: 2.5'; }
+.ql-snow .ql-picker.ql-lineHeight .ql-picker-label[data-value="3.0"]::before { content: 'Spacing: 3.0'; }
+
+.ql-snow .ql-picker.ql-lineHeight .ql-picker-item[data-value="1.0"]::before { content: '1.0'; }
+.ql-snow .ql-picker.ql-lineHeight .ql-picker-item[data-value="1.5"]::before { content: '1.5'; }
+.ql-snow .ql-picker.ql-lineHeight .ql-picker-item[data-value="2.0"]::before { content: '2.0'; }
+.ql-snow .ql-picker.ql-lineHeight .ql-picker-item[data-value="2.5"]::before { content: '2.5'; }
+.ql-snow .ql-picker.ql-lineHeight .ql-picker-item[data-value="3.0"]::before { content: '3.0'; }
+
+/* Dark mode fixes for ReactQuill */
+.dark .ql-snow.ql-toolbar button, .dark .ql-snow .ql-toolbar button {
+    color: #cbd5e1;
+}
+.dark .ql-snow.ql-toolbar .ql-picker-label, .dark .ql-snow .ql-toolbar .ql-picker-label {
+    color: #cbd5e1;
+}
+.dark .ql-snow.ql-toolbar .ql-stroke, .dark .ql-snow .ql-toolbar .ql-stroke {
+    stroke: #cbd5e1;
+}
+.dark .ql-snow.ql-toolbar .ql-fill, .dark .ql-snow .ql-toolbar .ql-fill {
+    fill: #cbd5e1;
+}
+.dark .ql-snow .ql-picker-options {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+.dark .ql-snow .ql-editor {
+    color: #e2e8f0;
+}
+.dark .ql-container.ql-snow {
+    border-color: #374151;
+}
+.dark .ql-toolbar.ql-snow {
+    border-color: #374151;
+    background-color: #1f2937;
+}
+
 /* Custom Scrollbar for a Premium Dark UI */
 ::-webkit-scrollbar {
     width: 8px;

@@ -101,7 +101,7 @@ export default function PublicIndex({ events }) {
                                         <div className="p-8 flex-1 flex flex-col relative z-20 pointer-events-none">
                                             <h3 className="text-3xl font-black mb-3 text-white leading-tight">{event.title}</h3>
                                             <p className="text-gray-400 mb-6 line-clamp-2 flex-1 text-sm leading-relaxed">
-                                                {event.description || 'Join us for this amazing experience.'}
+                                                {(event.description || 'Join us for this amazing experience.').replace(/<[^>]+>/g, '')}
                                             </p>
                                             
                                             <div className="flex justify-between items-center mt-auto pt-6 border-t border-white/10">

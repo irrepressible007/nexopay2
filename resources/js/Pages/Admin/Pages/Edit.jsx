@@ -4,6 +4,7 @@ import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
+import RichTextEditor from '@/Components/RichTextEditor';
 
 export default function Edit({ auth, page }) {
     const { data, setData, put, processing, errors } = useForm({
@@ -54,13 +55,11 @@ export default function Edit({ auth, page }) {
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="content" value="Content (Markdown supported) *" />
-                                <textarea
-                                    id="content"
-                                    className="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm h-64 font-mono text-sm"
+                                <InputLabel htmlFor="content" value="Page Content *" />
+                                <RichTextEditor
                                     value={data.content}
-                                    onChange={(e) => setData('content', e.target.value)}
-                                    required
+                                    onChange={(content) => setData('content', content)}
+                                    className="mt-1 min-h-[300px]"
                                 />
                                 <InputError message={errors.content} className="mt-2" />
                             </div>

@@ -197,7 +197,7 @@ export default function Show({ auth, event }) {
                                 <span className="w-8 h-1 bg-indigo-500 rounded-full inline-block"></span>
                                 About The Event
                             </h2>
-                            <div className="text-gray-300 leading-relaxed space-y-4 text-lg font-medium" dangerouslySetInnerHTML={{ __html: (event.description || '').replace(/\\n/g, '<br/>') }} />
+                            <div className="prose prose-invert prose-lg max-w-none text-gray-300 leading-relaxed space-y-4" dangerouslySetInnerHTML={{ __html: event.description || '' }} />
                         </section>
 
                         {/* Registration Flow */}

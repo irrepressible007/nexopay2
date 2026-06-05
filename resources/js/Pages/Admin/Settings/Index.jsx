@@ -2,6 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
+import RichTextEditor from '@/Components/RichTextEditor';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
 import { useState } from 'react';
@@ -153,12 +154,10 @@ export default function SettingsIndex({ auth, siteSettings = {} }) {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="col-span-full">
                                     <InputLabel htmlFor="contact_subtitle" value="Contact Subtitle / Description" className="text-gray-300" />
-                                    <TextInput
-                                        id="contact_subtitle"
-                                        type="text"
-                                        className="mt-1 block w-full"
+                                    <RichTextEditor
                                         value={data.contact_subtitle}
-                                        onChange={(e) => setData('contact_subtitle', e.target.value)}
+                                        onChange={(content) => setData('contact_subtitle', content)}
+                                        className="mt-1"
                                     />
                                 </div>
                                 <div>
@@ -201,12 +200,10 @@ export default function SettingsIndex({ auth, siteSettings = {} }) {
                             <div className="space-y-6">
                                 <div>
                                     <InputLabel htmlFor="footer_text" value="Footer Description / Copyright Text" className="text-gray-300" />
-                                    <TextInput
-                                        id="footer_text"
-                                        type="text"
-                                        className="mt-1 block w-full"
+                                    <RichTextEditor
                                         value={data.footer_text}
-                                        onChange={(e) => setData('footer_text', e.target.value)}
+                                        onChange={(content) => setData('footer_text', content)}
+                                        className="mt-1"
                                         placeholder="© 2026 Nexopay. All rights reserved."
                                     />
                                 </div>

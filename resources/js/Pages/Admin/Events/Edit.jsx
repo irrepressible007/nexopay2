@@ -5,6 +5,7 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
+import RichTextEditor from '@/Components/RichTextEditor';
 import SegmentBuilder from './SegmentBuilder';
 
 export default function Edit({ auth, event }) {
@@ -91,6 +92,17 @@ export default function Edit({ auth, event }) {
                                         <option value="past">Past</option>
                                     </select>
                                     <InputError message={errors.status} className="mt-2" />
+                                </div>
+
+                                <div className="col-span-1 md:col-span-2">
+                                    <InputLabel htmlFor="description" value="Event Description & Details" />
+                                    <RichTextEditor
+                                        value={data.description}
+                                        onChange={(content) => setData('description', content)}
+                                        className="mt-1"
+                                        placeholder="Describe your event..."
+                                    />
+                                    <InputError message={errors.description} className="mt-2" />
                                 </div>
 
                                 <div className="col-span-1 md:col-span-2 mt-2 p-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl flex items-center justify-between">
