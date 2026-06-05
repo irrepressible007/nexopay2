@@ -11,6 +11,7 @@ import SegmentBuilder from './SegmentBuilder';
 export default function Create({ auth }) {
     const { data, setData, post, processing, errors } = useForm({
         title: '',
+        cover_image: null,
         description: '',
         start_date: '',
         end_date: '',
@@ -95,6 +96,24 @@ export default function Create({ auth }) {
                                         <option value="past">Past</option>
                                     </select>
                                     <InputError message={errors.status} className="mt-2" />
+                                </div>
+
+                                <div className="col-span-1 md:col-span-2">
+                                    <InputLabel htmlFor="cover_image" value="Cover Image" />
+                                    <input
+                                        id="cover_image"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => setData('cover_image', e.target.files[0])}
+                                        className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400
+                                            file:mr-4 file:py-2 file:px-4
+                                            file:rounded-md file:border-0
+                                            file:text-sm file:font-semibold
+                                            file:bg-indigo-50 file:text-indigo-700
+                                            dark:file:bg-indigo-900/20 dark:file:text-indigo-400
+                                            hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900/30"
+                                    />
+                                    <InputError message={errors.cover_image} className="mt-2" />
                                 </div>
 
                                 <div className="col-span-1 md:col-span-2">

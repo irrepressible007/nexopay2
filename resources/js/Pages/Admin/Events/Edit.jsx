@@ -9,8 +9,9 @@ import RichTextEditor from '@/Components/RichTextEditor';
 import SegmentBuilder from './SegmentBuilder';
 
 export default function Edit({ auth, event }) {
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData, put, post, processing, errors } = useForm({
         title: event.title || '',
+        cover_image: null,
         description: event.description || '',
         start_date: event.start_date ? event.start_date.slice(0, 16) : '',
         end_date: event.end_date ? event.end_date.slice(0, 16) : '',
@@ -52,7 +53,14 @@ export default function Edit({ auth, event }) {
 
     const submit = (e) => {
         e.preventDefault();
-        put(route('admin.events.update', event.id));
+        
+        // When using method spoofing for PUT requests with FormData,
+        // we must use post() instead of put() and pass _method: 'put'.
+        // Otherwise PHP will not populate $_FILES.
+        post(route('admin.events.update', event.id), {
+            preserveScroll: true,
+            _method: 'put'
+        });
     };
 
     return (
@@ -95,6 +103,29 @@ export default function Edit({ auth, event }) {
                                         <option value="past">Past</option>
                                     </select>
                                     <InputError message={errors.status} className="mt-2" />
+                                </div>
+
+                                <div className="col-span-1 md:col-span-2">
+                                    <InputLabel htmlFor="cover_image" value="Cover Image" />
+                                    {event.cover_image && (
+                                        <div className="mb-3">
+                                            <img src={event.cover_image} alt="Current Cover" className="w-48 h-auto rounded-lg shadow-sm border border-gray-700" />
+                                        </div>
+                                    )}
+                                    <input
+                                        id="cover_image"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => setData('cover_image', e.target.files[0])}
+                                        className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400
+                                            file:mr-4 file:py-2 file:px-4
+                                            file:rounded-md file:border-0
+                                            file:text-sm file:font-semibold
+                                            file:bg-indigo-50 file:text-indigo-700
+                                            dark:file:bg-indigo-900/20 dark:file:text-indigo-400
+                                            hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900/30"
+                                    />
+                                    <InputError message={errors.cover_image} className="mt-2" />
                                 </div>
 
                                 <div className="col-span-1 md:col-span-2">

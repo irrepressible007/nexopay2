@@ -37,7 +37,8 @@ class EventController extends Controller
             'capacity' => 'nullable|integer|min:1',
             'has_base_price' => 'boolean',
             'gallery_images' => 'nullable|array',
-            'gallery_images.*' => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048'
+            'gallery_images.*' => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048'
         ]);
 
         $validated['segments'] = $request->input('segments', []);
@@ -58,6 +59,20 @@ class EventController extends Controller
                 $images[] = '/storage/events/galleries/' . $filename;
             }
             $validated['gallery_images'] = $images;
+        }
+
+        if ($request->hasFile('cover_image')) {
+            $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+            $directory = storage_path('app/public/events/covers');
+            
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true);
+            }
+
+            $file = $request->file('cover_image');
+            $filename = uniqid() . '.webp';
+            $manager->read($file->getRealPath())->toWebp(80)->save($directory . '/' . $filename);
+            $validated['cover_image'] = '/storage/events/covers/' . $filename;
         }
 
         $validated['slug'] = Str::slug($validated['title']) . '-' . uniqid();
@@ -95,7 +110,8 @@ class EventController extends Controller
             'capacity' => 'nullable|integer|min:1',
             'has_base_price' => 'boolean',
             'gallery_images' => 'nullable|array',
-            'gallery_images.*' => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048'
+            'gallery_images.*' => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048'
         ]);
 
         $validated['segments'] = $request->input('segments', []);
@@ -117,6 +133,20 @@ class EventController extends Controller
             }
             // For update, we might want to merge with existing. For simplicity, we just replace.
             $validated['gallery_images'] = $images;
+        }
+
+        if ($request->hasFile('cover_image')) {
+            $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+            $directory = storage_path('app/public/events/covers');
+            
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true);
+            }
+
+            $file = $request->file('cover_image');
+            $filename = uniqid() . '.webp';
+            $manager->read($file->getRealPath())->toWebp(80)->save($directory . '/' . $filename);
+            $validated['cover_image'] = '/storage/events/covers/' . $filename;
         }
 
         $event->update($validated);
