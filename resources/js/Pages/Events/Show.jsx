@@ -303,6 +303,18 @@ export default function Show({ auth, event }) {
                                                                         className="mt-2 block w-full bg-black/50 border-gray-700 text-white focus:border-indigo-500 rounded-xl shadow-sm transition"
                                                                         rows="3"
                                                                     />
+                                                                ) : field.type === 'select' ? (
+                                                                    <select
+                                                                        value={data.form_data[field.name] || ''}
+                                                                        onChange={e => setData('form_data', { ...data.form_data, [field.name]: e.target.value })}
+                                                                        required={field.required}
+                                                                        className="mt-2 block w-full bg-black/50 border-gray-700 text-white focus:border-indigo-500 rounded-xl shadow-sm transition [&>option]:bg-gray-900"
+                                                                    >
+                                                                        <option value="" disabled>Select an option...</option>
+                                                                        {field.options && field.options.map((opt, idx) => (
+                                                                            <option key={idx} value={opt}>{opt}</option>
+                                                                        ))}
+                                                                    </select>
                                                                 ) : (
                                                                     <TextInput
                                                                         type={field.type}

@@ -28,6 +28,7 @@ export default function Edit({ auth, event }) {
     const [fieldLabel, setFieldLabel] = useState('');
     const [fieldType, setFieldType] = useState('text');
     const [fieldRequired, setFieldRequired] = useState(false);
+    const [fieldOptions, setFieldOptions] = useState('');
 
     const addField = () => {
         if (!fieldLabel) return;
@@ -35,10 +36,12 @@ export default function Edit({ auth, event }) {
             name: fieldLabel.toLowerCase().replace(/[^a-z0-9]+/g, '_'),
             label: fieldLabel,
             type: fieldType,
-            required: fieldRequired
+            required: fieldRequired,
+            ...(fieldType === 'select' && { options: fieldOptions.split(',').map(o => o.trim()).filter(Boolean) })
         };
         setData('form_schema', [...data.form_schema, newField]);
         setFieldLabel('');
+        setFieldOptions('');
     };
 
     const removeField = (index) => {
@@ -228,8 +231,21 @@ export default function Edit({ auth, event }) {
                                             <option value="textarea">Textarea (Long)</option>
                                             <option value="number">Number</option>
                                             <option value="file">File Upload</option>
+                                            <option value="select">Dropdown (Select)</option>
                                         </select>
                                     </div>
+                                    {fieldType === 'select' && (
+                                        <div className="flex-1">
+                                            <InputLabel value="Dropdown Options" />
+                                            <TextInput
+                                                type="text"
+                                                value={fieldOptions}
+                                                onChange={(e) => setFieldOptions(e.target.value)}
+                                                placeholder="Comma separated: Small, Medium, Large"
+                                                className="mt-1 block w-full"
+                                            />
+                                        </div>
+                                    )}
                                     <div className="w-32 flex items-center mb-2">
                                         <input
                                             type="checkbox"
@@ -256,6 +272,9 @@ export default function Edit({ auth, event }) {
                                                     <span className="font-bold text-gray-800 dark:text-gray-200">{field.label}</span>
                                                     <span className="ml-2 text-sm text-gray-500">({field.type})</span>
                                                     {field.required && <span className="ml-2 text-xs text-red-500 font-bold">*Required</span>}
+                                                    {field.type === 'select' && field.options && (
+                                                        <span className="ml-2 text-xs text-gray-400">Options: {field.options.join(', ')}</span>
+                                                    )}
                                                 </div>
                                                 <button
                                                     type="button"
