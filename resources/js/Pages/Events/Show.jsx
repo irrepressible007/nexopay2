@@ -62,10 +62,14 @@ export default function Show({ auth, event }) {
         bkash_txid: '',
         form_data: initialFormData,
         selected_segments: selectedSegments,
+        selected_options: {},
+
         payable_amount: 0,
         guest_name: auth?.user ? auth.user.name : '',
         guest_email: auth?.user ? auth.user.email : '',
     });
+
+    const [selectedOptions, setSelectedOptions] = useState({});
 
     useEffect(() => {
         let total = 0;
@@ -82,13 +86,26 @@ export default function Show({ auth, event }) {
                 const subIds = Array.isArray(selection) ? selection : [selection];
                 subIds.forEach(subId => {
                     const sub = (seg.sub_segments || []).find(s => s.id === subId);
-                    if (sub) total += Number(sub.price || 0);
+                    if (sub) {
+                        if (!sub.has_options || sub.pricing_mode === 'global') {
+                            total += Number(sub.price || 0);
+                        } else if (sub.has_options && sub.pricing_mode === 'option') {
+                            const optSelection = selectedOptions[sub.id];
+                            if (optSelection) {
+                                const optIds = Array.isArray(optSelection) ? optSelection : [optSelection];
+                                optIds.forEach(optId => {
+                                    const opt = (sub.options || []).find(o => o.id === optId);
+                                    if (opt) total += Number(opt.price || 0);
+                                });
+                            }
+                        }
+                    }
                 });
             }
         });
         setTotalPrice(total);
-        setData(d => ({ ...d, payable_amount: total, selected_segments: selectedSegments, role: selectedRole }));
-    }, [selectedRole, selectedSegments, event.has_base_price, prices, segments]);
+        setData(d => ({ ...d, payable_amount: total, selected_segments: selectedSegments, selected_options: selectedOptions, role: selectedRole }));
+    }, [selectedRole, selectedSegments, selectedOptions, event.has_base_price, prices, segments]);
 
     const handleSegmentToggle = (segId, value, isMultiple) => {
         if (isMultiple) {
@@ -99,6 +116,18 @@ export default function Show({ auth, event }) {
             });
         } else {
             setSelectedSegments({ ...selectedSegments, [segId]: value });
+        }
+    };
+
+    const handleOptionToggle = (subId, optId, isMultiple) => {
+        if (isMultiple) {
+            const current = selectedOptions[subId] || [];
+            setSelectedOptions({
+                ...selectedOptions,
+                [subId]: current.includes(optId) ? current.filter(v => v !== optId) : [...current, optId]
+            });
+        } else {
+            setSelectedOptions({ ...selectedOptions, [subId]: optId });
         }
     };
 
@@ -375,21 +404,53 @@ export default function Show({ auth, event }) {
                                                                                 : selectedSegments[seg.id] === sub.id;
 
                                                                             return (
-                                                                                <label key={sub.id} className={`flex items-center justify-between p-5 border rounded-xl cursor-pointer transition ${isChecked ? 'border-indigo-500 bg-indigo-500/10 shadow-[0_0_15px_rgba(99,102,241,0.15)]' : 'border-gray-700 bg-black/50 hover:border-gray-500'}`}>
-                                                                                    <div className="flex items-center space-x-3">
-                                                                                        <input
-                                                                                            type={seg.allow_multiple ? "checkbox" : "radio"}
-                                                                                            name={`seg_${seg.id}`}
-                                                                                            checked={isChecked}
-                                                                                            onChange={() => handleSegmentToggle(seg.id, sub.id, seg.allow_multiple)}
-                                                                                            className={`${seg.allow_multiple ? 'rounded' : 'rounded-full'} border-gray-600 bg-black text-indigo-500 focus:ring-indigo-500 w-5 h-5`}
-                                                                                        />
-                                                                                        <span className="font-semibold text-gray-200">{sub.title}</span>
-                                                                                    </div>
-                                                                                    {seg.pricing_mode === 'sub_segment' && (
-                                                                                        <span className="font-black text-indigo-400">৳{sub.price}</span>
+                                                                                <div key={sub.id} className={`flex flex-col p-5 border rounded-xl transition ${isChecked ? 'border-indigo-500 bg-indigo-500/5 shadow-[0_0_15px_rgba(99,102,241,0.15)]' : 'border-gray-700 bg-black/50 hover:border-gray-500'}`}>
+                                                                                    <label className="flex items-center justify-between cursor-pointer">
+                                                                                        <div className="flex items-center space-x-3">
+                                                                                            <input
+                                                                                                type={seg.allow_multiple ? "checkbox" : "radio"}
+                                                                                                name={`seg_${seg.id}`}
+                                                                                                checked={isChecked}
+                                                                                                onChange={() => handleSegmentToggle(seg.id, sub.id, seg.allow_multiple)}
+                                                                                                className={`${seg.allow_multiple ? 'rounded' : 'rounded-full'} border-gray-600 bg-black text-indigo-500 focus:ring-indigo-500 w-5 h-5`}
+                                                                                            />
+                                                                                            <span className="font-semibold text-gray-200">{sub.title}</span>
+                                                                                        </div>
+                                                                                        {seg.pricing_mode === 'sub_segment' && (!sub.has_options || sub.pricing_mode === 'global') && (
+                                                                                            <span className="font-black text-indigo-400">৳{sub.price}</span>
+                                                                                        )}
+                                                                                    </label>
+
+                                                                                    {isChecked && sub.has_options && (
+                                                                                        <div className="mt-4 ml-8 space-y-3 pt-4 border-t border-gray-700/50">
+                                                                                            <h5 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Select Option</h5>
+                                                                                            <div className="space-y-2">
+                                                                                                {(sub.options || []).map(opt => {
+                                                                                                    const isOptChecked = sub.allow_multiple 
+                                                                                                        ? (selectedOptions[sub.id] || []).includes(opt.id)
+                                                                                                        : selectedOptions[sub.id] === opt.id;
+                                                                                                    return (
+                                                                                                        <label key={opt.id} className={`flex items-center justify-between cursor-pointer p-3 rounded-lg border transition ${isOptChecked ? 'border-indigo-500/50 bg-indigo-500/10' : 'border-gray-700/50 hover:bg-white/5'}`}>
+                                                                                                            <div className="flex items-center space-x-3">
+                                                                                                                <input
+                                                                                                                    type={sub.allow_multiple ? "checkbox" : "radio"}
+                                                                                                                    name={`opt_${sub.id}`}
+                                                                                                                    checked={isOptChecked}
+                                                                                                                    onChange={() => handleOptionToggle(sub.id, opt.id, sub.allow_multiple)}
+                                                                                                                    className={`${sub.allow_multiple ? 'rounded' : 'rounded-full'} border-gray-600 bg-black text-indigo-400 focus:ring-indigo-400 w-4 h-4`}
+                                                                                                                />
+                                                                                                                <span className="text-sm font-medium text-gray-300">{opt.title}</span>
+                                                                                                            </div>
+                                                                                                            {seg.pricing_mode === 'sub_segment' && sub.pricing_mode === 'option' && (
+                                                                                                                <span className="font-bold text-indigo-400 text-sm">৳{opt.price}</span>
+                                                                                                            )}
+                                                                                                        </label>
+                                                                                                    )
+                                                                                                })}
+                                                                                            </div>
+                                                                                        </div>
                                                                                     )}
-                                                                                </label>
+                                                                                </div>
                                                                             )
                                                                         })}
                                                                     </div>

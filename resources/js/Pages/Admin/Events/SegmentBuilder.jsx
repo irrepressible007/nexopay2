@@ -38,7 +38,11 @@ export default function SegmentBuilder({ segments = [], setSegments, hasBasePric
                         {
                             id: `sub_${Date.now()}`,
                             title: '',
-                            price: 0
+                            price: 0,
+                            has_options: false,
+                            allow_multiple: false,
+                            pricing_mode: 'global', // 'global' or 'option'
+                            options: []
                         }
                     ]
                 };
@@ -68,6 +72,73 @@ export default function SegmentBuilder({ segments = [], setSegments, hasBasePric
                     ...seg,
                     sub_segments: (seg.sub_segments || []).filter((_, j) => j !== subIndex)
                 };
+            }
+            return seg;
+        });
+        setSegments(newSegments);
+    };
+
+    const addOption = (segIndex, subIndex) => {
+        const newSegments = segments.map((seg, i) => {
+            if (i === segIndex) {
+                const newSubs = (seg.sub_segments || []).map((sub, j) => {
+                    if (j === subIndex) {
+                        return {
+                            ...sub,
+                            has_options: true,
+                            options: [
+                                ...(sub.options || []),
+                                {
+                                    id: `opt_${Date.now()}`,
+                                    title: '',
+                                    price: 0
+                                }
+                            ]
+                        };
+                    }
+                    return sub;
+                });
+                return { ...seg, sub_segments: newSubs };
+            }
+            return seg;
+        });
+        setSegments(newSegments);
+    };
+
+    const updateOption = (segIndex, subIndex, optIndex, key, value) => {
+        const newSegments = segments.map((seg, i) => {
+            if (i === segIndex) {
+                const newSubs = (seg.sub_segments || []).map((sub, j) => {
+                    if (j === subIndex) {
+                        const newOpts = (sub.options || []).map((opt, k) => 
+                            k === optIndex ? { ...opt, [key]: value } : opt
+                        );
+                        return { ...sub, options: newOpts };
+                    }
+                    return sub;
+                });
+                return { ...seg, sub_segments: newSubs };
+            }
+            return seg;
+        });
+        setSegments(newSegments);
+    };
+
+    const removeOption = (segIndex, subIndex, optIndex) => {
+        const newSegments = segments.map((seg, i) => {
+            if (i === segIndex) {
+                const newSubs = (seg.sub_segments || []).map((sub, j) => {
+                    if (j === subIndex) {
+                        const newOpts = (sub.options || []).filter((_, k) => k !== optIndex);
+                        return { 
+                            ...sub, 
+                            options: newOpts,
+                            has_options: newOpts.length > 0
+                        };
+                    }
+                    return sub;
+                });
+                return { ...seg, sub_segments: newSubs };
             }
             return seg;
         });
@@ -121,7 +192,7 @@ export default function SegmentBuilder({ segments = [], setSegments, hasBasePric
                                     onChange={(e) => updateSegment(segIndex, 'pricing_mode', e.target.value)}
                                     className="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 rounded-md shadow-sm"
                                 >
-                                    <option value="sub_segment">Price per Sub-segment</option>
+                                    <option value="sub_segment">Price per Sub-segment/Option</option>
                                     <option value="global">Global Segment Price</option>
                                 </select>
                             </div>
@@ -155,59 +226,141 @@ export default function SegmentBuilder({ segments = [], setSegments, hasBasePric
                                         onChange={(e) => updateSegment(segIndex, 'allow_multiple', e.target.checked)}
                                         className="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 mr-2"
                                     />
-                                    <span className="text-sm text-gray-600 dark:text-gray-400">Allow Multiple Selections</span>
+                                    <span className="text-sm text-gray-600 dark:text-gray-400">Allow Multiple Sub-segments</span>
                                 </div>
                             </div>
                         </div>
 
                         <div className="mt-4 border-t border-gray-200 dark:border-gray-600 pt-4">
                             <div className="flex justify-between items-center mb-2">
-                                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Sub-segments (Options)</h4>
+                                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Sub-segments</h4>
                                 <button
                                     type="button"
                                     onClick={() => addSubSegment(segIndex)}
                                     className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 text-sm font-bold"
                                 >
-                                    + Add Option
+                                    + Add Sub-segment
                                 </button>
                             </div>
 
                             {segment.sub_segments.length > 0 ? (
-                                <div className="space-y-2">
+                                <div className="space-y-4">
                                     {segment.sub_segments.map((sub, subIndex) => (
-                                        <div key={sub.id} className="flex gap-4 items-center bg-white dark:bg-gray-800 p-3 rounded border border-gray-200 dark:border-gray-700">
-                                            <div className="flex-1">
-                                                <TextInput
-                                                    type="text"
-                                                    value={sub.title}
-                                                    onChange={(e) => updateSubSegment(segIndex, subIndex, 'title', e.target.value)}
-                                                    placeholder="Option Title (e.g. FIFA, Day 1)"
-                                                    className="block w-full text-sm"
-                                                />
-                                            </div>
-                                            {segment.pricing_mode === 'sub_segment' && (
-                                                <div className="w-32 flex items-center gap-2">
-                                                    <span className="text-gray-500 dark:text-gray-400 text-sm">৳</span>
+                                        <div key={sub.id} className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                            
+                                            {/* Sub-segment Header row */}
+                                            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center mb-2">
+                                                <div className="flex-1 w-full">
+                                                    <InputLabel value="Sub-segment Title" className="text-xs" />
                                                     <TextInput
-                                                        type="number"
-                                                        value={sub.price}
-                                                        onChange={(e) => updateSubSegment(segIndex, subIndex, 'price', e.target.value)}
-                                                        className="block w-full text-sm"
+                                                        type="text"
+                                                        value={sub.title}
+                                                        onChange={(e) => updateSubSegment(segIndex, subIndex, 'title', e.target.value)}
+                                                        placeholder="e.g. Olympiad, T-Shirt"
+                                                        className="block w-full text-sm mt-1"
                                                     />
                                                 </div>
+
+                                                {segment.pricing_mode === 'sub_segment' && (!sub.has_options || sub.pricing_mode === 'global') && (
+                                                    <div className="w-full sm:w-32">
+                                                        <InputLabel value="Price (৳)" className="text-xs" />
+                                                        <TextInput
+                                                            type="number"
+                                                            value={sub.price}
+                                                            onChange={(e) => updateSubSegment(segIndex, subIndex, 'price', e.target.value)}
+                                                            className="block w-full text-sm mt-1"
+                                                        />
+                                                    </div>
+                                                )}
+
+                                                <div className="flex gap-2 self-end sm:self-center mt-2 sm:mt-5">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => addOption(segIndex, subIndex)}
+                                                        className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 text-xs font-bold bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1.5 rounded"
+                                                    >
+                                                        + Add Option
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeSubSegment(segIndex, subIndex)}
+                                                        className="text-red-500 hover:text-red-700 text-sm font-bold ml-2"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {/* Options Area (Level 3) */}
+                                            {sub.has_options && (
+                                                <div className="mt-4 pl-4 sm:pl-8 border-l-2 border-indigo-100 dark:border-indigo-900/50 space-y-3">
+                                                    
+                                                    {/* Options settings */}
+                                                    <div className="flex flex-wrap gap-4 mb-3 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-100 dark:border-gray-700">
+                                                        {segment.pricing_mode === 'sub_segment' && (
+                                                            <div>
+                                                                <InputLabel value="Option Pricing Mode" className="text-xs" />
+                                                                <select
+                                                                    value={sub.pricing_mode || 'global'}
+                                                                    onChange={(e) => updateSubSegment(segIndex, subIndex, 'pricing_mode', e.target.value)}
+                                                                    className="mt-1 block w-full text-xs border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 rounded-md shadow-sm"
+                                                                >
+                                                                    <option value="global">Fixed Price for Sub-segment</option>
+                                                                    <option value="option">Price per Option</option>
+                                                                </select>
+                                                            </div>
+                                                        )}
+                                                        <div className="flex items-center self-end pb-2">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={sub.allow_multiple}
+                                                                onChange={(e) => updateSubSegment(segIndex, subIndex, 'allow_multiple', e.target.checked)}
+                                                                className="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 mr-2"
+                                                            />
+                                                            <span className="text-xs text-gray-600 dark:text-gray-400">Allow Multiple Options</span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Options loop */}
+                                                    {(sub.options || []).map((opt, optIndex) => (
+                                                        <div key={opt.id} className="flex gap-3 items-center">
+                                                            <div className="flex-1">
+                                                                <TextInput
+                                                                    type="text"
+                                                                    value={opt.title}
+                                                                    onChange={(e) => updateOption(segIndex, subIndex, optIndex, 'title', e.target.value)}
+                                                                    placeholder="Option Title (e.g. Senior Category)"
+                                                                    className="block w-full text-sm bg-gray-50 dark:bg-gray-900"
+                                                                />
+                                                            </div>
+                                                            {segment.pricing_mode === 'sub_segment' && sub.pricing_mode === 'option' && (
+                                                                <div className="w-24 flex items-center gap-1">
+                                                                    <span className="text-gray-500 text-sm">৳</span>
+                                                                    <TextInput
+                                                                        type="number"
+                                                                        value={opt.price}
+                                                                        onChange={(e) => updateOption(segIndex, subIndex, optIndex, 'price', e.target.value)}
+                                                                        className="block w-full text-sm bg-gray-50 dark:bg-gray-900"
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => removeOption(segIndex, subIndex, optIndex)}
+                                                                className="text-red-400 hover:text-red-600 text-sm font-bold ml-1"
+                                                            >
+                                                                ✕
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             )}
-                                            <button
-                                                type="button"
-                                                onClick={() => removeSubSegment(segIndex, subIndex)}
-                                                className="text-red-500 hover:text-red-700 text-sm font-bold"
-                                            >
-                                                ✕
-                                            </button>
+
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <p className="text-sm text-gray-500 dark:text-gray-400 italic">No options added yet.</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 italic">No sub-segments added yet.</p>
                             )}
                         </div>
                     </div>

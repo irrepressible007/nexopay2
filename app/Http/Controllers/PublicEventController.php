@@ -64,6 +64,7 @@ class PublicEventController extends Controller
             'bkash_txid' => 'required|string|unique:registrations,bkash_txid',
             'form_data' => 'nullable|array',
             'selected_segments' => 'nullable|array',
+            'selected_options' => 'nullable|array',
         ];
 
         if (!$event->require_login && !auth()->check()) {
@@ -91,6 +92,7 @@ class PublicEventController extends Controller
         }
 
         $selectedSegments = $request->selected_segments ?? [];
+        $selectedOptions = $request->selected_options ?? [];
         $eventSegments = $event->segments ?? [];
 
         foreach ($eventSegments as $seg) {
@@ -101,25 +103,35 @@ class PublicEventController extends Controller
             $selection = $selectedSegments[$seg['id']];
 
             if (isset($seg['pricing_mode']) && $seg['pricing_mode'] === 'global') {
-                if ($selection === true) {
+                if ($selection === true || (!empty($selection) && (is_array($selection) || is_string($selection)))) {
                     $total += (float) ($seg['global_price'] ?? 0);
                 }
             } else {
-                if (is_array($selection)) {
-                    foreach ($selection as $subId) {
-                        $sub = collect($seg['sub_segments'] ?? [])->firstWhere('id', $subId);
-                        if ($sub) {
-                            $total += (float) ($sub['price'] ?? 0);
-                        }
-                    }
-                } else {
-                    $sub = collect($seg['sub_segments'] ?? [])->firstWhere('id', $selection);
+                $subIds = is_array($selection) ? $selection : [$selection];
+                foreach ($subIds as $subId) {
+                    $sub = collect($seg['sub_segments'] ?? [])->firstWhere('id', $subId);
                     if ($sub) {
-                        $total += (float) ($sub['price'] ?? 0);
+                        if (empty($sub['has_options']) || (isset($sub['pricing_mode']) && $sub['pricing_mode'] === 'global')) {
+                            $total += (float) ($sub['price'] ?? 0);
+                        } else if (!empty($sub['has_options']) && isset($sub['pricing_mode']) && $sub['pricing_mode'] === 'option') {
+                            if (isset($selectedOptions[$sub['id']])) {
+                                $optSelection = $selectedOptions[$sub['id']];
+                                $optIds = is_array($optSelection) ? $optSelection : [$optSelection];
+                                foreach ($optIds as $optId) {
+                                    $opt = collect($sub['options'] ?? [])->firstWhere('id', $optId);
+                                    if ($opt) {
+                                        $total += (float) ($opt['price'] ?? 0);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
+        
+        // Merge options for registration payload
+        $selectedSegments['__options'] = $selectedOptions;
 
         // Smart auto-fill logic for logged in users
         $user = auth()->user();
