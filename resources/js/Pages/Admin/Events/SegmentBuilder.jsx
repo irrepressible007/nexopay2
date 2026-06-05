@@ -243,9 +243,9 @@ export default function SegmentBuilder({ segments = [], setSegments, hasBasePric
                                 </button>
                             </div>
 
-                            {segment.sub_segments.length > 0 ? (
+                            {(segment.sub_segments || []).length > 0 ? (
                                 <div className="space-y-4">
-                                    {segment.sub_segments.map((sub, subIndex) => (
+                                    {(segment.sub_segments || []).map((sub, subIndex) => (
                                         <div key={sub.id} className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
                                             
                                             {/* Sub-segment Header row */}
