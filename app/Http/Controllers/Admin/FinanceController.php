@@ -42,7 +42,7 @@ class FinanceController extends Controller
         if ($recipientEmail) {
             try {
                 Mail::to($recipientEmail)->send(new RegistrationConfirmed($registration));
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 return back()->with('error', 'Registration approved, but failed to send email: ' . $e->getMessage());
             }
         }
@@ -66,7 +66,7 @@ class FinanceController extends Controller
         if ($recipientEmail) {
             try {
                 Mail::to($recipientEmail)->send(new RegistrationRejectedMail($registration));
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 return back()->with('error', 'Registration rejected, but failed to send email: ' . $e->getMessage());
             }
         }
@@ -88,14 +88,14 @@ class FinanceController extends Controller
             try {
                 Mail::to($recipientEmail)->send(new RegistrationConfirmed($registration));
                 return back()->with('success', 'Approval ticket resent successfully!');
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 return back()->with('error', 'Failed to resend approval email: ' . $e->getMessage());
             }
         } elseif ($registration->status === 'rejected') {
             try {
                 Mail::to($recipientEmail)->send(new RegistrationRejectedMail($registration));
                 return back()->with('success', 'Rejection email resent successfully!');
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 return back()->with('error', 'Failed to resend rejection email: ' . $e->getMessage());
             }
         }
