@@ -66,12 +66,12 @@ export default function Index({ auth, registrations }) {
                                         registrations.data.map((reg) => (
                                             <tr key={reg.id} className={reg.status === 'pending' ? 'bg-yellow-50 dark:bg-yellow-900/10' : ''}>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm font-bold text-gray-900 dark:text-white">{reg.user.name}</div>
-                                                    <div className="text-sm text-gray-500">{reg.user.email}</div>
+                                                    <div className="text-sm font-bold text-gray-900 dark:text-white">{reg.user?.name || reg.guest_name || 'Unknown User'}</div>
+                                                    <div className="text-sm text-gray-500">{reg.user?.email || reg.guest_email || 'No email provided'}</div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm font-bold text-gray-900 dark:text-white">{reg.event.title}</div>
-                                                    <div className="text-sm text-gray-500">{reg.role.name}</div>
+                                                    <div className="text-sm font-bold text-gray-900 dark:text-white">{reg.event?.title || 'Unknown Event'}</div>
+                                                    <div className="text-sm text-gray-500">{reg.role?.name || 'Participant'}</div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap font-mono text-sm uppercase">
                                                     {reg.bkash_txid}
