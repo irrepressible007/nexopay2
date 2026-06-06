@@ -237,7 +237,7 @@ export default function Show({ auth, event }) {
                                 About The Event
                             </h2>
                             {event.short_description && (
-                                <div className="prose prose-invert prose-lg max-w-none text-gray-300 leading-relaxed space-y-4" dangerouslySetInnerHTML={{ __html: event.short_description }} />
+                                <div className="prose prose-invert prose-lg max-w-none text-gray-300 leading-relaxed space-y-4" dangerouslySetInnerHTML={{ __html: event.short_description || '' }} />
                             )}
                             
                             {event.description && (
@@ -252,7 +252,7 @@ export default function Show({ auth, event }) {
                                         </button>
                                     )}
                                     {(showFullDescription || !event.short_description) && (
-                                        <div className={`prose prose-invert prose-lg max-w-none text-gray-300 leading-relaxed space-y-4 ${event.short_description ? 'mt-4 pt-4 border-t border-gray-800/60' : ''}`} dangerouslySetInnerHTML={{ __html: event.description }} />
+                                        <div className={`prose prose-invert prose-lg max-w-none text-gray-300 leading-relaxed space-y-4 ${event.short_description ? 'mt-4 pt-4 border-t border-gray-800/60' : ''}`} dangerouslySetInnerHTML={{ __html: event.description || '' }} />
                                     )}
                                     {showFullDescription && event.short_description && (
                                         <button 
