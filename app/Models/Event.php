@@ -50,4 +50,9 @@ class Event extends Model
     {
         return $this->hasMany(Registration::class);
     }
+
+    protected function serializeDate(\DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d\TH:i:s');
+    }
 }
