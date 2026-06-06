@@ -40,7 +40,11 @@ class FinanceController extends Controller
         // Trigger Resend Email
         $recipientEmail = $registration->user ? $registration->user->email : $registration->guest_email;
         if ($recipientEmail) {
-            Mail::to($recipientEmail)->send(new RegistrationConfirmed($registration));
+            try {
+                Mail::to($recipientEmail)->send(new RegistrationConfirmed($registration));
+            } catch (\Exception $e) {
+                return back()->with('error', 'Registration approved, but failed to send email: ' . $e->getMessage());
+            }
         }
 
         return back()->with('success', 'Registration approved and ticket sent!');
@@ -60,7 +64,11 @@ class FinanceController extends Controller
         // Trigger Resend Email for Rejection
         $recipientEmail = $registration->user ? $registration->user->email : $registration->guest_email;
         if ($recipientEmail) {
-            Mail::to($recipientEmail)->send(new RegistrationRejectedMail($registration));
+            try {
+                Mail::to($recipientEmail)->send(new RegistrationRejectedMail($registration));
+            } catch (\Exception $e) {
+                return back()->with('error', 'Registration rejected, but failed to send email: ' . $e->getMessage());
+            }
         }
 
         return back()->with('success', 'Registration rejected and user notified.');
@@ -77,11 +85,19 @@ class FinanceController extends Controller
             if (empty($registration->qr_uuid)) {
                 $registration->update(['qr_uuid' => (string) \Illuminate\Support\Str::uuid()]);
             }
-            Mail::to($recipientEmail)->send(new RegistrationConfirmed($registration));
-            return back()->with('success', 'Approval ticket resent successfully!');
+            try {
+                Mail::to($recipientEmail)->send(new RegistrationConfirmed($registration));
+                return back()->with('success', 'Approval ticket resent successfully!');
+            } catch (\Exception $e) {
+                return back()->with('error', 'Failed to resend approval email: ' . $e->getMessage());
+            }
         } elseif ($registration->status === 'rejected') {
-            Mail::to($recipientEmail)->send(new RegistrationRejectedMail($registration));
-            return back()->with('success', 'Rejection email resent successfully!');
+            try {
+                Mail::to($recipientEmail)->send(new RegistrationRejectedMail($registration));
+                return back()->with('success', 'Rejection email resent successfully!');
+            } catch (\Exception $e) {
+                return back()->with('error', 'Failed to resend rejection email: ' . $e->getMessage());
+            }
         }
 
         return back()->with('error', 'Registration is still pending. Cannot resend email.');
