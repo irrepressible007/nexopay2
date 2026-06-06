@@ -42,6 +42,29 @@ export default function Show({ auth, event }) {
         'Campus Ambassador': event.ca_price,
         Volunteer: event.volunteer_price
     });
+
+    // Parse role from URL and scroll to form
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const roleParam = urlParams.get('role');
+        
+        if (roleParam) {
+            const normalizedParam = roleParam.toLowerCase().trim();
+            if (normalizedParam === 'ca' || normalizedParam === 'campus ambassador') {
+                setSelectedRole('Campus Ambassador');
+            } else if (normalizedParam === 'volunteer') {
+                setSelectedRole('Volunteer');
+            }
+            
+            // Auto scroll to the registration form after a brief delay to allow rendering
+            setTimeout(() => {
+                const registerSection = document.getElementById('register');
+                if (registerSection) {
+                    registerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 500);
+        }
+    }, []);
     
     const activeSchema = selectedRole === 'Campus Ambassador' 
         ? (event.ca_form_schema || []) 
