@@ -144,6 +144,15 @@ export default function Show({ auth, event }) {
         post(route('event.register', event.slug));
     };
 
+    const handleNextStep = (e, targetStep) => {
+        const form = e.target.closest('form');
+        if (form && !form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+        setStep(targetStep);
+    };
+
     const isGuest = !auth?.user;
     const canRegister = !event.require_login || auth?.user;
 
@@ -397,7 +406,7 @@ export default function Show({ auth, event }) {
                                                 )}
 
                                                 <div className="flex justify-end pt-6 border-t border-gray-800">
-                                                    <button type="button" onClick={() => setStep(2)} className="bg-indigo-600 text-white px-8 py-3.5 rounded-full font-bold hover:bg-indigo-500 transition shadow-[0_0_15px_rgba(99,102,241,0.4)] flex items-center gap-2">
+                                                    <button type="button" onClick={(e) => handleNextStep(e, 2)} className="bg-indigo-600 text-white px-8 py-3.5 rounded-full font-bold hover:bg-indigo-500 transition shadow-[0_0_15px_rgba(99,102,241,0.4)] flex items-center gap-2">
                                                         Continue to Segments
                                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                                                     </button>
@@ -500,7 +509,7 @@ export default function Show({ auth, event }) {
                                                     <button type="button" onClick={() => setStep(1)} className="text-gray-400 hover:text-white font-bold px-4 py-2">
                                                         ← Back
                                                     </button>
-                                                    <button type="button" onClick={() => setStep(3)} className="bg-indigo-600 text-white px-8 py-3.5 rounded-full font-bold hover:bg-indigo-500 transition shadow-[0_0_15px_rgba(99,102,241,0.4)]">
+                                                    <button type="button" onClick={(e) => handleNextStep(e, 3)} className="bg-indigo-600 text-white px-8 py-3.5 rounded-full font-bold hover:bg-indigo-500 transition shadow-[0_0_15px_rgba(99,102,241,0.4)]">
                                                         Proceed to Payment →
                                                     </button>
                                                 </div>
