@@ -155,7 +155,12 @@ class PublicEventController extends Controller
 
         $recipientEmail = $user ? $user->email : $request->guest_email;
         if ($recipientEmail) {
-            \Illuminate\Support\Facades\Mail::to($recipientEmail)->send(new \App\Mail\RegistrationSubmitted($registration));
+            try {
+                \Illuminate\Support\Facades\Mail::to($recipientEmail)->send(new \App\Mail\RegistrationSubmitted($registration));
+            } catch (\Throwable $e) {
+                // Silently ignore mail failure or log it, don't crash registration
+                \Illuminate\Support\Facades\Log::error('Failed to send registration email: ' . $e->getMessage());
+            }
         }
 
         if (!$user) {
