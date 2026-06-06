@@ -11,6 +11,7 @@ import FormBuilder from './FormBuilder';
 
 export default function Edit({ auth, event }) {
     const { data, setData, put, post, processing, errors } = useForm({
+        _method: 'put',
         title: event.title || '',
         cover_image: null,
         description: event.description || '',
@@ -34,12 +35,9 @@ export default function Edit({ auth, event }) {
     const submit = (e) => {
         e.preventDefault();
         
-        // When using method spoofing for PUT requests with FormData,
-        // we must use post() instead of put() and pass _method: 'put'.
-        // Otherwise PHP will not populate $_FILES.
         post(route('admin.events.update', event.id), {
             preserveScroll: true,
-            _method: 'put'
+            forceFormData: true,
         });
     };
 
