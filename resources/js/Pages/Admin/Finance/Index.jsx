@@ -3,7 +3,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 
 export default function Index({ auth, registrations }) {
-    const { post, processing } = useForm();
+    const { post, delete: destroy, processing } = useForm();
 
     const handleApprove = (id) => {
         if (confirm('Are you sure you want to approve this registration? It will send a Premium Ticket email.')) {
@@ -20,6 +20,12 @@ export default function Index({ auth, registrations }) {
     const handleResend = (id) => {
         if (confirm('Are you sure you want to resend the email for this registration?')) {
             post(route('admin.finance.resend', id));
+        }
+    };
+
+    const handleDelete = (id) => {
+        if (confirm('Are you absolutely sure you want to permanently delete this registration? This action cannot be undone and will update revenue.')) {
+            destroy(route('admin.finance.destroy', id));
         }
     };
 
@@ -97,16 +103,23 @@ export default function Index({ auth, registrations }) {
                                                             <button 
                                                                 onClick={() => handleApprove(reg.id)}
                                                                 disabled={processing}
-                                                                className="bg-green-600 text-white px-3 py-1 rounded shadow hover:bg-green-700 transition"
+                                                                className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded transition"
                                                             >
                                                                 Approve
                                                             </button>
                                                             <button 
                                                                 onClick={() => handleReject(reg.id)}
                                                                 disabled={processing}
-                                                                className="bg-red-600 text-white px-3 py-1 rounded shadow hover:bg-red-700 transition"
+                                                                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition"
                                                             >
                                                                 Reject
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => handleDelete(reg.id)}
+                                                                disabled={processing}
+                                                                className="bg-gray-800 hover:bg-black text-white px-3 py-1 rounded transition ml-2"
+                                                            >
+                                                                Delete
                                                             </button>
                                                         </div>
                                                     )}
@@ -120,6 +133,13 @@ export default function Index({ auth, registrations }) {
                                                             >
                                                                 Resend Email
                                                             </button>
+                                                            <button 
+                                                                onClick={() => handleDelete(reg.id)}
+                                                                disabled={processing}
+                                                                className="text-xs bg-red-100 hover:bg-red-200 text-red-800 dark:bg-red-900 dark:hover:bg-red-800 dark:text-red-200 px-2 py-1 rounded transition"
+                                                            >
+                                                                Delete
+                                                            </button>
                                                         </div>
                                                     )}
                                                     {reg.status === 'rejected' && (
@@ -131,6 +151,13 @@ export default function Index({ auth, registrations }) {
                                                                 className="text-xs bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 px-2 py-1 rounded transition"
                                                             >
                                                                 Resend Email
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => handleDelete(reg.id)}
+                                                                disabled={processing}
+                                                                className="text-xs bg-red-100 hover:bg-red-200 text-red-800 dark:bg-red-900 dark:hover:bg-red-800 dark:text-red-200 px-2 py-1 rounded transition"
+                                                            >
+                                                                Delete
                                                             </button>
                                                         </div>
                                                     )}

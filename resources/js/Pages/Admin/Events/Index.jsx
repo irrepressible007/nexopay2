@@ -41,8 +41,9 @@ export default function Index({ auth, events }) {
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{event.title}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 capitalize">{event.status}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{event.start_date ? new Date(event.start_date).toLocaleDateString() : 'N/A'}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <Link href={route('admin.events.edit', event.id)} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 mr-4">Edit</Link>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex items-center gap-4">
+                                                <Link href={route('admin.analytics.index', { event_id: event.id })} className="text-green-600 hover:text-green-900 dark:text-green-400 font-bold">Analytics</Link>
+                                                <Link href={route('admin.events.edit', event.id)} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400">Edit</Link>
                                                 <Link href={route('admin.events.destroy', event.id)} method="delete" as="button" className="text-red-600 hover:text-red-900 dark:text-red-400">Delete</Link>
                                             </td>
                                         </tr>

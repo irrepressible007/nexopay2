@@ -2,8 +2,9 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 
-export default function AnalyticsIndex({ auth, events, selectedEventId, stats }) {
+export default function AnalyticsIndex({ auth, events, selectedEventId, stats, registrations = [], dynamicColumns = [] }) {
     const [eventId, setEventId] = useState(selectedEventId || '');
+    const [searchTerm, setSearchTerm] = useState('');
 
     const handleFilterChange = (e) => {
         const value = e.target.value;
@@ -18,6 +19,34 @@ export default function AnalyticsIndex({ auth, events, selectedEventId, stats })
     const handleExportDetailed = () => {
         window.location.href = route('admin.analytics.export.detailed', { event_id: eventId });
     };
+
+    // Filter registrations by search term
+    const filteredRegistrations = registrations.filter(reg => {
+        if (!searchTerm) return true;
+        const term = searchTerm.toLowerCase();
+        
+        const userName = reg.user ? reg.user.name : (reg.guest_name || '');
+        const userEmail = reg.user ? reg.user.email : (reg.guest_email || '');
+        const txid = reg.bkash_txid || '';
+        
+        if (userName.toLowerCase().includes(term)) return true;
+        if (userEmail.toLowerCase().includes(term)) return true;
+        if (txid.toLowerCase().includes(term)) return true;
+        if (reg.status.toLowerCase().includes(term)) return true;
+
+        // Search inside dynamic form fields
+        if (reg.form_data) {
+            for (const key of dynamicColumns) {
+                const val = reg.form_data[key];
+                if (val) {
+                    const strVal = Array.isArray(val) ? val.join(' ') : String(val);
+                    if (strVal.toLowerCase().includes(term)) return true;
+                }
+            }
+        }
+        
+        return false;
+    });
 
     return (
         <AuthenticatedLayout
@@ -98,7 +127,7 @@ export default function AnalyticsIndex({ auth, events, selectedEventId, stats })
                     </div>
 
                     {/* Breakdown Sections */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         
                         {/* Registration Status Breakdown */}
                         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
@@ -158,6 +187,94 @@ export default function AnalyticsIndex({ auth, events, selectedEventId, stats })
                         </div>
 
                     </div>
+
+                    {/* Detailed Data Table */}
+                    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg flex flex-col">
+                        <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-900">
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">Detailed Registrations</h3>
+                                <p className="text-sm text-gray-500 mt-1">Scroll horizontally to view custom form fields. Use the search to filter all columns.</p>
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Search any field..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-64"
+                            />
+                        </div>
+                        <div className="overflow-x-auto p-0">
+                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm whitespace-nowrap">
+                                <thead className="bg-gray-100 dark:bg-gray-800">
+                                    <tr>
+                                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300 sticky left-0 bg-gray-100 dark:bg-gray-800 z-10 shadow-[1px_0_0_0_#e5e7eb] dark:shadow-[1px_0_0_0_#374151]">Name</th>
+                                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Email</th>
+                                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Role</th>
+                                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Status</th>
+                                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">TxID</th>
+                                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Amount</th>
+                                        
+                                        {/* Render Dynamic Columns */}
+                                        {dynamicColumns && dynamicColumns.map(col => (
+                                            <th key={col} className="px-4 py-3 text-left font-semibold text-indigo-700 dark:text-indigo-400 border-l border-gray-200 dark:border-gray-700">
+                                                {col}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
+                                    {filteredRegistrations.length > 0 ? (
+                                        filteredRegistrations.map(reg => (
+                                            <tr key={reg.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                                                <td className="px-4 py-3 text-gray-900 dark:text-gray-100 sticky left-0 bg-white dark:bg-gray-900 shadow-[1px_0_0_0_#e5e7eb] dark:shadow-[1px_0_0_0_#374151] font-medium">
+                                                    {reg.user ? reg.user.name : reg.guest_name} {reg.user ? '' : <span className="text-xs text-gray-500 font-normal ml-1">(Guest)</span>}
+                                                </td>
+                                                <td className="px-4 py-3 text-gray-600 dark:text-gray-400">
+                                                    {reg.user ? reg.user.email : reg.guest_email}
+                                                </td>
+                                                <td className="px-4 py-3 text-gray-600 dark:text-gray-400 capitalize">
+                                                    {reg.role?.name || 'N/A'}
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                                        reg.status === 'approved' ? 'bg-green-100 text-green-800' : 
+                                                        reg.status === 'rejected' ? 'bg-red-100 text-red-800' : 
+                                                        'bg-yellow-100 text-yellow-800'
+                                                    }`}>
+                                                        {reg.status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-4 py-3 text-gray-600 dark:text-gray-400 font-mono text-xs">
+                                                    {reg.bkash_txid || '-'}
+                                                </td>
+                                                <td className="px-4 py-3 text-gray-600 dark:text-gray-400 font-semibold">
+                                                    ৳{reg.payable_amount}
+                                                </td>
+                                                
+                                                {/* Render Dynamic Column Values */}
+                                                {dynamicColumns && dynamicColumns.map(col => {
+                                                    const rawVal = (reg.form_data && reg.form_data[col]) ? reg.form_data[col] : '-';
+                                                    const displayVal = Array.isArray(rawVal) ? rawVal.join(', ') : rawVal;
+                                                    return (
+                                                        <td key={col} className="px-4 py-3 text-gray-600 dark:text-gray-400 border-l border-gray-100 dark:border-gray-800 max-w-[200px] truncate" title={displayVal}>
+                                                            {displayVal}
+                                                        </td>
+                                                    );
+                                                })}
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={6 + (dynamicColumns ? dynamicColumns.length : 0)} className="px-4 py-8 text-center text-gray-500">
+                                                No registrations match your search.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </AuthenticatedLayout>

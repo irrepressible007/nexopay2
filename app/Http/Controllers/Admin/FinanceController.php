@@ -145,4 +145,12 @@ class FinanceController extends Controller
 
         return response()->stream($callback, 200, $headers);
     }
+
+    public function destroy(Registration $registration)
+    {
+        // Actually delete the registration permanently
+        $registration->delete();
+
+        return back()->with('success', 'Registration permanently deleted.');
+    }
 }

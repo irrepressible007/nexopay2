@@ -38,6 +38,17 @@ class AnalyticsController extends Controller
 
         $registrations = $query->get();
 
+        // Extract Dynamic Columns
+        $dynamicColumns = [];
+        foreach ($registrations as $reg) {
+            $formData = is_array($reg->form_data) ? $reg->form_data : [];
+            foreach (array_keys($formData) as $key) {
+                if (!in_array($key, $dynamicColumns)) {
+                    $dynamicColumns[] = $key;
+                }
+            }
+        }
+
         $stats['total_registrations'] = $registrations->count();
         $stats['approved_registrations'] = $registrations->where('status', 'approved')->count();
         $stats['pending_registrations'] = $registrations->where('status', 'pending')->count();
@@ -62,7 +73,9 @@ class AnalyticsController extends Controller
         return Inertia::render('Admin/Analytics/Index', [
             'events' => $events,
             'selectedEventId' => $eventId,
-            'stats' => $stats
+            'stats' => $stats,
+            'registrations' => $registrations,
+            'dynamicColumns' => $dynamicColumns
         ]);
     }
 
@@ -139,24 +152,66 @@ class AnalyticsController extends Controller
             "Expires"             => "0"
         ];
 
-        $callback = function() use ($registrations) {
+        $dynamicColumns = [];
+        foreach ($registrations as $reg) {
+            $formData = is_array($reg->form_data) ? $reg->form_data : [];
+            foreach (array_keys($formData) as $key) {
+                if (!in_array($key, $dynamicColumns)) {
+                    $dynamicColumns[] = $key;
+                }
+            }
+        }
+
+        $callback = function() use ($registrations, $dynamicColumns) {
             $file = fopen('php://output', 'w');
 
             $cols = ['ID', 'Event', 'User Name', 'User Email', 'Role', 'Status', 'Payable Amount', 'bKash TXID', 'Registered At'];
+            // Add dynamic columns
+            $cols = array_merge($cols, $dynamicColumns);
+            // Add Selected Segments Column
+            $cols[] = 'Selected Segments';
+
             fputcsv($file, $cols);
 
             foreach ($registrations as $reg) {
-                fputcsv($file, [
+                $userName = $reg->user ? $reg->user->name : ($reg->guest_name ?? 'N/A');
+                $userEmail = $reg->user ? $reg->user->email : ($reg->guest_email ?? 'N/A');
+
+                $row = [
                     $reg->id,
                     $reg->event ? $reg->event->title : 'N/A',
-                    $reg->user ? $reg->user->name : 'N/A',
-                    $reg->user ? $reg->user->email : 'N/A',
+                    $userName,
+                    $userEmail,
                     $reg->role ? $reg->role->name : 'N/A',
                     $reg->status,
                     $reg->payable_amount,
                     $reg->bkash_txid,
                     $reg->created_at->toDateTimeString(),
-                ]);
+                ];
+
+                $formData = is_array($reg->form_data) ? $reg->form_data : [];
+                foreach ($dynamicColumns as $dc) {
+                    $val = $formData[$dc] ?? '';
+                    if (is_array($val)) {
+                        $val = implode(', ', $val);
+                    }
+                    $row[] = $val;
+                }
+
+                // Format selected segments
+                $segments = '';
+                if (!empty($reg->selected_segments) && is_array($reg->selected_segments)) {
+                    $segArr = [];
+                    foreach ($reg->selected_segments as $k => $v) {
+                        if ($k !== '__options') {
+                            $segArr[] = "SegID:$k=" . (is_array($v) ? implode('|', $v) : $v);
+                        }
+                    }
+                    $segments = implode(', ', $segArr);
+                }
+                $row[] = $segments;
+
+                fputcsv($file, $row);
             }
             
             fclose($file);
