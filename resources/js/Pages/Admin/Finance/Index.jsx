@@ -17,6 +17,12 @@ export default function Index({ auth, registrations }) {
         }
     };
 
+    const handleResend = (id) => {
+        if (confirm('Are you sure you want to resend the email for this registration?')) {
+            post(route('admin.finance.resend', id));
+        }
+    };
+
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -105,10 +111,28 @@ export default function Index({ auth, registrations }) {
                                                         </div>
                                                     )}
                                                     {reg.status === 'approved' && (
-                                                        <span className="text-green-600 font-bold">Ticket Sent ✓</span>
+                                                        <div className="flex items-center gap-3">
+                                                            <span className="text-green-600 font-bold">Ticket Sent ✓</span>
+                                                            <button 
+                                                                onClick={() => handleResend(reg.id)}
+                                                                disabled={processing}
+                                                                className="text-xs bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 px-2 py-1 rounded transition"
+                                                            >
+                                                                Resend Email
+                                                            </button>
+                                                        </div>
                                                     )}
                                                     {reg.status === 'rejected' && (
-                                                        <span className="text-red-600 font-bold">Rejected ✕</span>
+                                                        <div className="flex items-center gap-3">
+                                                            <span className="text-red-600 font-bold">Rejected ✕</span>
+                                                            <button 
+                                                                onClick={() => handleResend(reg.id)}
+                                                                disabled={processing}
+                                                                className="text-xs bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 px-2 py-1 rounded transition"
+                                                            >
+                                                                Resend Email
+                                                            </button>
+                                                        </div>
                                                     )}
                                                 </td>
                                             </tr>

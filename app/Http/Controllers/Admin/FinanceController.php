@@ -66,6 +66,24 @@ class FinanceController extends Controller
         return back()->with('success', 'Registration rejected and user notified.');
     }
 
+    public function resend(Registration $registration)
+    {
+        $recipientEmail = $registration->user ? $registration->user->email : $registration->guest_email;
+        if (!$recipientEmail) {
+            return back()->with('error', 'No email address found for this registration.');
+        }
+
+        if ($registration->status === 'approved') {
+            Mail::to($recipientEmail)->send(new RegistrationConfirmed($registration));
+            return back()->with('success', 'Approval ticket resent successfully!');
+        } elseif ($registration->status === 'rejected') {
+            Mail::to($recipientEmail)->send(new RegistrationRejectedMail($registration));
+            return back()->with('success', 'Rejection email resent successfully!');
+        }
+
+        return back()->with('error', 'Registration is still pending. Cannot resend email.');
+    }
+
     public function export(Request $request)
     {
         // Simple secure token check, or just rely on the admin middleware

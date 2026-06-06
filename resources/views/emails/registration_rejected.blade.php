@@ -1,7 +1,7 @@
 <x-mail::message>
 # Registration Issue
 
-Hi {{ $registration->user->name }},
+Hi {{ $registration->user ? $registration->user->name : $registration->guest_name }},
 
 We encountered an issue while verifying your payment for **{{ $registration->event->title }}**.
 

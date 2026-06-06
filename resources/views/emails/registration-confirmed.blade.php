@@ -36,7 +36,7 @@
             <div class="details-box">
                 <div class="detail-row">
                     <span class="detail-label">Role:</span>
-                    <span class="detail-value">{{ $registration->role->name }}</span>
+                    <span class="detail-value">{{ $registration->role ? $registration->role->name : 'Participant' }}</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Total Paid:</span>

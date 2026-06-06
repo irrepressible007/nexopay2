@@ -48,6 +48,7 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(
     Route::get('/finance', [\App\Http\Controllers\Admin\FinanceController::class, 'index'])->name('finance.index');
     Route::post('/finance/{registration}/approve', [\App\Http\Controllers\Admin\FinanceController::class, 'approve'])->name('finance.approve');
     Route::post('/finance/{registration}/reject', [\App\Http\Controllers\Admin\FinanceController::class, 'reject'])->name('finance.reject');
+    Route::post('/finance/{registration}/resend', [\App\Http\Controllers\Admin\FinanceController::class, 'resend'])->name('finance.resend');
 
     Route::get('/checkin', [\App\Http\Controllers\Admin\CheckInController::class, 'index'])->name('checkin.index');
     Route::post('/checkin', [\App\Http\Controllers\Admin\CheckInController::class, 'process'])->name('checkin.process');
