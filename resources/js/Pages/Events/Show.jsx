@@ -450,7 +450,7 @@ export default function Show({ auth, event }) {
                                                                             onChange={(e) => handleSegmentToggle(seg.id, e.target.checked, false)}
                                                                             className="rounded bg-black border-gray-600 text-indigo-500 focus:ring-indigo-500 w-6 h-6"
                                                                         />
-                                                                        <span className="font-medium text-gray-200">Yes, I want to participate in {seg.title}</span>
+                                                                        <span className="font-medium text-gray-200">{seg.title}</span>
                                                                     </label>
                                                                 ) : (
                                                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

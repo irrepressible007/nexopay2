@@ -213,7 +213,7 @@ export default function SegmentBuilder({ segments = [], setSegments, hasBasePric
                                 <div className="flex items-center">
                                     <input
                                         type="checkbox"
-                                        checked={segment.is_mandatory}
+                                        checked={segment.is_mandatory === true || segment.is_mandatory === 'true' || segment.is_mandatory === 1 || segment.is_mandatory === '1'}
                                         onChange={(e) => updateSegment(segIndex, 'is_mandatory', e.target.checked)}
                                         className="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 mr-2"
                                     />
@@ -222,7 +222,7 @@ export default function SegmentBuilder({ segments = [], setSegments, hasBasePric
                                 <div className="flex items-center">
                                     <input
                                         type="checkbox"
-                                        checked={segment.allow_multiple}
+                                        checked={segment.allow_multiple === true || segment.allow_multiple === 'true' || segment.allow_multiple === 1 || segment.allow_multiple === '1'}
                                         onChange={(e) => updateSegment(segIndex, 'allow_multiple', e.target.checked)}
                                         className="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 mr-2"
                                     />
