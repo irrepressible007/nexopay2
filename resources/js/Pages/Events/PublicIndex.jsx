@@ -76,7 +76,7 @@ export default function PublicIndex({ events }) {
                                                 <img 
                                                     src={event.cover_image} 
                                                     alt={event.title}
-                                                    className="w-full h-full object-cover filter grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-110"
+                                                    className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
                                                 />
                                             ) : (
                                                 <div className="w-full h-full bg-gradient-to-br from-indigo-900/50 to-purple-900/50" />
@@ -101,16 +101,16 @@ export default function PublicIndex({ events }) {
                                         <div className="p-8 flex-1 flex flex-col relative z-20 pointer-events-none">
                                             <h3 className="text-3xl font-black mb-3 text-white leading-tight">{event.title}</h3>
                                             <p className="text-gray-400 mb-6 line-clamp-2 flex-1 text-sm leading-relaxed">
-                                                {(event.description || 'Join us for this amazing experience.').replace(/<[^>]+>/g, '')}
+                                                {(event.short_description || event.description || 'Join us for this amazing experience.').replace(/<[^>]*>?/gm, '')}
                                             </p>
                                             
-                                            <div className="flex justify-between items-center mt-auto pt-6 border-t border-white/10">
+                                            <div className="flex justify-between items-center mt-auto pt-6 border-t border-white/10 pointer-events-auto">
                                                 <div className="text-sm font-semibold text-gray-400">
                                                     Tickets from <span className="text-white text-lg font-bold ml-1">৳{event.participant_price}</span>
                                                 </div>
-                                                <span className="bg-indigo-600 text-white px-5 py-2.5 rounded-full text-sm font-bold opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0 shadow-[0_0_15px_rgba(99,102,241,0.5)] pointer-events-auto">
+                                                <Link href={`${route('event.show', event.slug)}#register`} className="relative z-30 bg-indigo-600 text-white px-5 py-2.5 rounded-full text-sm font-bold shadow-[0_0_15px_rgba(99,102,241,0.5)] hover:bg-indigo-500 transition-colors">
                                                     Get Tickets
-                                                </span>
+                                                </Link>
                                             </div>
                                         </div>
                                     </motion.div>
