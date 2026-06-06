@@ -301,9 +301,20 @@ export default function Show({ auth, event }) {
                                         <div className="mb-8 p-5 bg-amber-500/10 border border-amber-500/20 rounded-2xl">
                                             <div className="flex gap-3">
                                                 <svg className="w-6 h-6 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                                <div>
+                                                <div className="flex-1">
                                                     <h4 className="text-amber-500 font-bold mb-1">Guest Checkout Active</h4>
-                                                    <p className="text-amber-400/80 text-sm">You are checking out as a guest. You will not have a dashboard to view your registration later. A confirmation email with your ticket will be sent directly to your inbox upon approval.</p>
+                                                    <p className="text-amber-400/80 text-sm mb-3">You are checking out as a guest. You will not have a dashboard to view your registration later. A confirmation email with your ticket will be sent directly to your inbox upon approval.</p>
+                                                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-3 border-t border-amber-500/20">
+                                                        <span className="text-amber-300 text-sm font-medium">Want to track your ticket?</span>
+                                                        <div className="flex gap-2">
+                                                            <Link href={route('login')} className="text-xs font-bold bg-amber-500 text-amber-950 px-4 py-1.5 rounded-full hover:bg-amber-400 transition">
+                                                                Log In
+                                                            </Link>
+                                                            <Link href={route('register')} className="text-xs font-bold border border-amber-500/50 text-amber-500 px-4 py-1.5 rounded-full hover:bg-amber-500/10 transition">
+                                                                Create Account
+                                                            </Link>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
