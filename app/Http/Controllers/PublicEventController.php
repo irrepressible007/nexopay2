@@ -59,27 +59,7 @@ class PublicEventController extends Controller
             return redirect()->route('login')->with('error', 'You must be logged in to register for this event.');
         }
 
-        $rules = [
-            'role' => 'required|string',
-            'bkash_txid' => 'required|string|unique:registrations,bkash_txid',
-            'form_data' => 'nullable|array',
-            'selected_segments' => 'nullable|array',
-            'selected_options' => 'nullable|array',
-        ];
-
-        if (!$event->require_login && !auth()->check()) {
-            $rules['guest_name'] = 'required|string|max:255';
-            $rules['guest_email'] = 'required|email|max:255';
-        }
-
-        $request->validate($rules);
-
-        $role = Role::firstOrCreate([
-            'name' => $request->role,
-            'slug' => strtolower(str_replace(' ', '-', $request->role))
-        ]);
-
-        // Secure Server-side Price Calculation
+        // --- Calculate Total Price First ---
         $total = 0;
         
         if ($event->has_base_price) {
@@ -93,34 +73,38 @@ class PublicEventController extends Controller
 
         $selectedSegments = $request->selected_segments ?? [];
         $selectedOptions = $request->selected_options ?? [];
-        $eventSegments = $event->segments ?? [];
+        
+        // Only calculate segment prices for Participants
+        if ($request->role === 'Participant') {
+            $eventSegments = $event->segments ?? [];
 
-        foreach ($eventSegments as $seg) {
-            if (!isset($selectedSegments[$seg['id']])) {
-                continue;
-            }
-
-            $selection = $selectedSegments[$seg['id']];
-
-            if (isset($seg['pricing_mode']) && $seg['pricing_mode'] === 'global') {
-                if ($selection === true || (!empty($selection) && (is_array($selection) || is_string($selection)))) {
-                    $total += (float) ($seg['global_price'] ?? 0);
+            foreach ($eventSegments as $seg) {
+                if (!isset($selectedSegments[$seg['id']])) {
+                    continue;
                 }
-            } else {
-                $subIds = is_array($selection) ? $selection : [$selection];
-                foreach ($subIds as $subId) {
-                    $sub = collect($seg['sub_segments'] ?? [])->firstWhere('id', $subId);
-                    if ($sub) {
-                        if (empty($sub['has_options']) || (isset($sub['pricing_mode']) && $sub['pricing_mode'] === 'global')) {
-                            $total += (float) ($sub['price'] ?? 0);
-                        } else if (!empty($sub['has_options']) && isset($sub['pricing_mode']) && $sub['pricing_mode'] === 'option') {
-                            if (isset($selectedOptions[$sub['id']])) {
-                                $optSelection = $selectedOptions[$sub['id']];
-                                $optIds = is_array($optSelection) ? $optSelection : [$optSelection];
-                                foreach ($optIds as $optId) {
-                                    $opt = collect($sub['options'] ?? [])->firstWhere('id', $optId);
-                                    if ($opt) {
-                                        $total += (float) ($opt['price'] ?? 0);
+
+                $selection = $selectedSegments[$seg['id']];
+
+                if (isset($seg['pricing_mode']) && $seg['pricing_mode'] === 'global') {
+                    if ($selection === true || (!empty($selection) && (is_array($selection) || is_string($selection)))) {
+                        $total += (float) ($seg['global_price'] ?? 0);
+                    }
+                } else {
+                    $subIds = is_array($selection) ? $selection : [$selection];
+                    foreach ($subIds as $subId) {
+                        $sub = collect($seg['sub_segments'] ?? [])->firstWhere('id', $subId);
+                        if ($sub) {
+                            if (empty($sub['has_options']) || (isset($sub['pricing_mode']) && $sub['pricing_mode'] === 'global')) {
+                                $total += (float) ($sub['price'] ?? 0);
+                            } else if (!empty($sub['has_options']) && isset($sub['pricing_mode']) && $sub['pricing_mode'] === 'option') {
+                                if (isset($selectedOptions[$sub['id']])) {
+                                    $optSelection = $selectedOptions[$sub['id']];
+                                    $optIds = is_array($optSelection) ? $optSelection : [$optSelection];
+                                    foreach ($optIds as $optId) {
+                                        $opt = collect($sub['options'] ?? [])->firstWhere('id', $optId);
+                                        if ($opt) {
+                                            $total += (float) ($opt['price'] ?? 0);
+                                        }
                                     }
                                 }
                             }
@@ -128,10 +112,43 @@ class PublicEventController extends Controller
                     }
                 }
             }
+        } else {
+            // Force empty segments for non-participants to be safe
+            $selectedSegments = [];
+            $selectedOptions = [];
         }
-        
+
+        // --- Validate Request ---
+        $rules = [
+            'role' => 'required|string',
+            'form_data' => 'nullable|array',
+            'selected_segments' => 'nullable|array',
+            'selected_options' => 'nullable|array',
+        ];
+
+        // Require bkash_txid only if total amount to pay is greater than 0
+        if ($total > 0) {
+            $rules['bkash_txid'] = 'required|string|unique:registrations,bkash_txid';
+        } else {
+            $rules['bkash_txid'] = 'nullable|string';
+        }
+
+        if (!$event->require_login && !auth()->check()) {
+            $rules['guest_name'] = 'required|string|max:255';
+            $rules['guest_email'] = 'required|email|max:255';
+        }
+
+        $request->validate($rules);
+
+        $role = Role::firstOrCreate([
+            'name' => $request->role,
+            'slug' => strtolower(str_replace(' ', '-', $request->role))
+        ]);
+
         // Merge options for registration payload
-        $selectedSegments['__options'] = $selectedOptions;
+        if ($request->role === 'Participant') {
+            $selectedSegments['__options'] = $selectedOptions;
+        }
 
         // Smart auto-fill logic for logged in users
         $user = auth()->user();
@@ -147,7 +164,7 @@ class PublicEventController extends Controller
             'event_id' => $event->id,
             'role_id' => $role->id,
             'bkash_txid' => $request->bkash_txid,
-            'status' => 'pending',
+            'status' => 'pending', // You could auto-approve free ones, but let's leave it pending for now
             'form_data' => $request->form_data,
             'selected_segments' => $selectedSegments,
             'payable_amount' => $total,
@@ -158,15 +175,26 @@ class PublicEventController extends Controller
             try {
                 \Illuminate\Support\Facades\Mail::to($recipientEmail)->send(new \App\Mail\RegistrationSubmitted($registration));
             } catch (\Throwable $e) {
-                // Silently ignore mail failure or log it, don't crash registration
                 \Illuminate\Support\Facades\Log::error('Failed to send registration email: ' . $e->getMessage());
             }
         }
 
-        if (!$user) {
-            return redirect()->route('home')->with('success', 'Registration submitted! You will receive a confirmation email once approved.');
+        // Custom Success Messages Based on Role
+        $roleName = $request->role;
+        $successMsg = '';
+
+        if ($roleName === 'Campus Ambassador') {
+            $successMsg = 'Campus Ambassador registration successful! You will receive a confirmation email shortly. Thank you for volunteering!';
+        } elseif ($roleName === 'Volunteer') {
+            $successMsg = 'Volunteer registration successful! You will receive a confirmation email shortly. Thank you for volunteering!';
+        } else {
+            $successMsg = 'Registration submitted! ' . ($total > 0 ? 'Your payment is pending verification.' : 'You are fully registered.');
         }
 
-        return redirect()->route('dashboard')->with('success', 'Registration submitted and pending Finance approval.');
+        if (!$user) {
+            return redirect()->route('home')->with('success', $successMsg);
+        }
+
+        return redirect()->route('dashboard')->with('success', $successMsg);
     }
 }
