@@ -1,7 +1,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
+import { useState } from 'react';
 
 export default function Dashboard({ auth, metrics, siteSettings }) {
+    const [primaryColor, setPrimaryColor] = useState(siteSettings?.primary_color || '#4f46e5');
+
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -48,23 +51,30 @@ export default function Dashboard({ auth, metrics, siteSettings }) {
                         {/* Theme Customizer */}
                         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
                             <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Theme Customization</h3>
-                            <p className="text-sm text-gray-500 mb-4">Set the primary color for the platform. For example: <span className="font-mono">#4f46e5</span> or <span className="font-mono">indigo</span>.</p>
+                            <p className="text-sm text-gray-500 mb-4">Set the primary color for the platform. You can pick a color visually or enter a hex code.</p>
                             <form onSubmit={(e) => {
                                 e.preventDefault();
-                                const formData = new FormData(e.target);
                                 router.post(route('admin.settings.update'), {
-                                    primary_color: formData.get('primary_color')
+                                    primary_color: primaryColor
                                 });
                             }} className="flex gap-4 items-end">
                                 <div className="flex-1">
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Primary Color (Hex or Name)</label>
-                                    <input 
-                                        type="text" 
-                                        name="primary_color"
-                                        defaultValue={siteSettings?.primary_color || ''}
-                                        placeholder="e.g. #4f46e5"
-                                        className="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full"
-                                    />
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Primary Color</label>
+                                    <div className="flex items-center gap-3">
+                                        <input 
+                                            type="color" 
+                                            value={primaryColor}
+                                            onChange={(e) => setPrimaryColor(e.target.value)}
+                                            className="h-10 w-14 cursor-pointer rounded border border-gray-300 bg-white p-1"
+                                        />
+                                        <input 
+                                            type="text" 
+                                            value={primaryColor}
+                                            onChange={(e) => setPrimaryColor(e.target.value)}
+                                            placeholder="e.g. #4f46e5"
+                                            className="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm flex-1"
+                                        />
+                                    </div>
                                 </div>
                                 <button type="submit" className="bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-900 px-4 py-2 rounded shadow hover:bg-gray-700 transition">Save</button>
                             </form>
