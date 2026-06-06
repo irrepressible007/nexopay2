@@ -2,13 +2,23 @@ import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+
 export default function Navbar() {
-    const { auth, siteSettings = {}, navPages = [] } = usePage().props;
+    const { auth, siteSettings = {}, navPages = [], flash = {} } = usePage().props;
     const user = auth?.user;
     
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+    const [showToast, setShowToast] = useState(false);
+
+    useEffect(() => {
+        if (flash.success || flash.error) {
+            setShowToast(true);
+            const timer = setTimeout(() => setShowToast(false), 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [flash.success, flash.error]);
 
     return (
         <nav className="border-b border-white/10 bg-[#030712]/70 backdrop-blur-xl sticky top-0 z-50">
@@ -159,6 +169,37 @@ export default function Navbar() {
                                 <ResponsiveNavLink href={route('register')}>Register</ResponsiveNavLink>
                             </div>
                         )}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Global Toast Notifications */}
+            <AnimatePresence>
+                {showToast && (flash.success || flash.error) && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20, x: 20 }}
+                        animate={{ opacity: 1, y: 0, x: 0 }}
+                        exit={{ opacity: 0, y: -20, x: 20 }}
+                        className={`fixed top-24 right-6 z-[100] max-w-sm w-full p-4 rounded-xl shadow-2xl border backdrop-blur-xl ${
+                            flash.success 
+                                ? 'bg-green-900/40 border-green-500/30 text-green-100' 
+                                : 'bg-red-900/40 border-red-500/30 text-red-100'
+                        }`}
+                    >
+                        <div className="flex gap-3">
+                            {flash.success ? (
+                                <svg className="w-6 h-6 text-green-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            ) : (
+                                <svg className="w-6 h-6 text-red-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            )}
+                            <div>
+                                <h4 className="font-bold">{flash.success ? 'Success' : 'Error'}</h4>
+                                <p className="text-sm opacity-90">{flash.success || flash.error}</p>
+                            </div>
+                            <button onClick={() => setShowToast(false)} className="ml-auto shrink-0 opacity-50 hover:opacity-100 transition">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
