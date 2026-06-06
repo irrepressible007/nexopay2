@@ -49,7 +49,15 @@ export default function Show({ auth, event }) {
             ? (event.volunteer_form_schema || []) 
             : (event.form_schema || []);
             
-    const segments = event.segments || [];
+    const segments = (event.segments || []).map(seg => ({
+        ...seg,
+        is_mandatory: seg.is_mandatory === true || seg.is_mandatory === 'true' || seg.is_mandatory === 1 || seg.is_mandatory === '1',
+        allow_multiple: seg.allow_multiple === true || seg.allow_multiple === 'true' || seg.allow_multiple === 1 || seg.allow_multiple === '1',
+        sub_segments: (seg.sub_segments || []).map(sub => ({
+            ...sub,
+            allow_multiple: sub.allow_multiple === true || sub.allow_multiple === 'true' || sub.allow_multiple === 1 || sub.allow_multiple === '1'
+        }))
+    }));
     
     const initialFormData = {};
     activeSchema.forEach(field => {
