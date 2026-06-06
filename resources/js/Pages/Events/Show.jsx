@@ -54,6 +54,8 @@ export default function Show({ auth, event }) {
                 setSelectedRole('Campus Ambassador');
             } else if (normalizedParam === 'volunteer') {
                 setSelectedRole('Volunteer');
+            } else if (normalizedParam === 'participant') {
+                setSelectedRole('Participant');
             }
             
             // Auto scroll to the registration form after a brief delay to allow rendering
