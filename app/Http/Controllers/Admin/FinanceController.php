@@ -74,6 +74,9 @@ class FinanceController extends Controller
         }
 
         if ($registration->status === 'approved') {
+            if (empty($registration->qr_uuid)) {
+                $registration->update(['qr_uuid' => (string) \Illuminate\Support\Str::uuid()]);
+            }
             Mail::to($recipientEmail)->send(new RegistrationConfirmed($registration));
             return back()->with('success', 'Approval ticket resent successfully!');
         } elseif ($registration->status === 'rejected') {

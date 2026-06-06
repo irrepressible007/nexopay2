@@ -50,10 +50,10 @@
                 @endif
             </div>
 
-            @if(count($registration->selected_segments) > 0)
+            @if(!empty($registration->selected_segments) && count($registration->selected_segments) > 0)
                 <h3 style="margin-bottom: 15px; color: #1f2937;">Your Segments</h3>
                 <ul style="margin-top: 0; padding-left: 20px; color: #374151; line-height: 1.6;">
-                    @foreach($registration->event->segments as $seg)
+                    @foreach($registration->event->segments ?? [] as $seg)
                         @if(isset($registration->selected_segments[$seg['id']]))
                             @php $selection = $registration->selected_segments[$seg['id']]; @endphp
                             @if(isset($seg['pricing_mode']) && $seg['pricing_mode'] === 'global')
