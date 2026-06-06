@@ -10,8 +10,13 @@ return new class extends Migration
     {
         Schema::table('registrations', function (Blueprint $table) {
             $table->unsignedBigInteger('user_id')->nullable()->change();
-            $table->string('guest_name')->nullable()->after('user_id');
-            $table->string('guest_email')->nullable()->after('guest_name');
+            
+            if (!Schema::hasColumn('registrations', 'guest_name')) {
+                $table->string('guest_name')->nullable()->after('user_id');
+            }
+            if (!Schema::hasColumn('registrations', 'guest_email')) {
+                $table->string('guest_email')->nullable()->after('guest_name');
+            }
         });
     }
 
