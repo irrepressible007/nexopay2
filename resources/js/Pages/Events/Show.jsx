@@ -561,18 +561,27 @@ export default function Show({ auth, event }) {
                                             <motion.div key="step3" initial={{opacity:0, x:20}} animate={{opacity:1, x:0}} exit={{opacity:0, x:-20}}>
                                                 
                                                 <div className="bg-gradient-to-br from-indigo-900/40 to-purple-900/40 p-8 rounded-3xl border border-indigo-500/30 mb-8 shadow-2xl relative overflow-hidden">
-                                                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 blur-3xl rounded-full" />
-                                                    <h3 className="text-2xl font-black text-white mb-6 relative z-10">Payment Instructions</h3>
+                                                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 blur-3xl rounded-full pointer-events-none" />
+                                                    <h3 className="text-2xl font-black text-white mb-6 relative z-10 flex items-center justify-between">
+                                                        <span>Payment Instructions</span>
+                                                        <span className="text-indigo-300 text-lg">Total: <span className="text-white font-mono bg-black/40 px-3 py-1 rounded-lg">৳{totalPrice}</span></span>
+                                                    </h3>
                                                     
-                                                    <div className="space-y-4 relative z-10">
-                                                        <div className="flex gap-4">
-                                                            <div className="w-8 h-8 rounded-full bg-indigo-500 text-white font-bold flex items-center justify-center flex-shrink-0">1</div>
-                                                            <p className="text-indigo-100 text-lg pt-0.5">Send exactly <strong className="text-white text-xl bg-black/30 px-2 py-0.5 rounded">৳{totalPrice}</strong> to our bKash Merchant Number: <strong className="text-white bg-black/30 px-2 py-0.5 rounded tracking-widest">017XX-XXXXXX</strong></p>
-                                                        </div>
-                                                        <div className="flex gap-4">
-                                                            <div className="w-8 h-8 rounded-full bg-indigo-500 text-white font-bold flex items-center justify-center flex-shrink-0">2</div>
-                                                            <p className="text-indigo-100 text-lg pt-0.5">Enter the exact bKash Transaction ID (TrxID) below to verify your payment.</p>
-                                                        </div>
+                                                    <div className="relative z-10 prose prose-invert max-w-none prose-img:rounded-xl prose-img:shadow-lg prose-a:text-indigo-400">
+                                                        {event.payment_instructions ? (
+                                                            <div dangerouslySetInnerHTML={{ __html: event.payment_instructions }} />
+                                                        ) : (
+                                                            <div className="space-y-4">
+                                                                <div className="flex gap-4">
+                                                                    <div className="w-8 h-8 rounded-full bg-indigo-500 text-white font-bold flex items-center justify-center flex-shrink-0">1</div>
+                                                                    <p className="text-indigo-100 text-lg pt-0.5">Send exactly <strong className="text-white text-xl bg-black/30 px-2 py-0.5 rounded">৳{totalPrice}</strong> to our bKash Merchant Number: <strong className="text-white bg-black/30 px-2 py-0.5 rounded tracking-widest">017XX-XXXXXX</strong></p>
+                                                                </div>
+                                                                <div className="flex gap-4">
+                                                                    <div className="w-8 h-8 rounded-full bg-indigo-500 text-white font-bold flex items-center justify-center flex-shrink-0">2</div>
+                                                                    <p className="text-indigo-100 text-lg pt-0.5">Enter the exact bKash Transaction ID (TrxID) below to verify your payment.</p>
+                                                                </div>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                                 

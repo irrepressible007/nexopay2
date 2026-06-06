@@ -29,6 +29,7 @@ export default function Edit({ auth, event }) {
         segments: event.segments || [],
         has_base_price: event.has_base_price ?? false,
         require_login: event.require_login !== undefined ? event.require_login : true,
+        payment_instructions: event.payment_instructions || '',
     });
 
     const [activeFormTab, setActiveFormTab] = useState('participant');
@@ -226,6 +227,17 @@ export default function Edit({ auth, event }) {
                                     />
                                     <InputError message={errors.capacity} className="mt-2" />
                                 </div>
+                            </div>
+
+                            <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
+                                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Payment Instructions</h3>
+                                <p className="text-sm text-gray-500 mb-4">Add your custom payment instructions, bKash numbers, or QR code images here. These will be shown to users at Step 3.</p>
+                                <RichTextEditor
+                                    value={data.payment_instructions}
+                                    onChange={(content) => setData('payment_instructions', content)}
+                                    placeholder="e.g. Send money to 01XXX-XXXXXX (bKash Personal) and enter the Transaction ID below..."
+                                />
+                                <InputError message={errors.payment_instructions} className="mt-2" />
                             </div>
 
                             <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">

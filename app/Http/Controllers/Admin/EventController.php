@@ -40,7 +40,8 @@ class EventController extends Controller
             'require_login' => 'boolean',
             'gallery_images' => 'nullable|array',
             'gallery_images.*' => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
-            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048'
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'payment_instructions' => 'nullable|string',
         ]);
 
         $validated['segments'] = $request->input('segments', []);
@@ -117,7 +118,8 @@ class EventController extends Controller
             'require_login' => 'boolean',
             'gallery_images' => 'nullable|array',
             'gallery_images.*' => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
-            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048'
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'payment_instructions' => 'nullable|string',
         ]);
 
         $validated['segments'] = $request->input('segments', []);

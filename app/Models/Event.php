@@ -29,6 +29,7 @@ class Event extends Model
         'gallery_images',
         'has_base_price',
         'require_login',
+        'payment_instructions',
     ];
 
     protected function casts(): array
