@@ -13,6 +13,7 @@ export default function Edit({ auth, event }) {
     const { data, setData, put, post, processing, errors } = useForm({
         _method: 'put',
         title: event.title || '',
+        short_description: event.short_description || '',
         cover_image: null,
         description: event.description || '',
         start_date: event.start_date ? event.start_date.slice(0, 16) : '',
@@ -107,12 +108,23 @@ export default function Edit({ auth, event }) {
                                 </div>
 
                                 <div className="col-span-1 md:col-span-2">
-                                    <InputLabel htmlFor="description" value="Event Description & Details" />
+                                    <InputLabel htmlFor="short_description" value="Short Description (Appears before 'Read More')" />
+                                    <RichTextEditor
+                                        value={data.short_description}
+                                        onChange={(content) => setData('short_description', content)}
+                                        className="mt-1"
+                                        placeholder="Brief details about the event..."
+                                    />
+                                    <InputError message={errors.short_description} className="mt-2" />
+                                </div>
+
+                                <div className="col-span-1 md:col-span-2 mt-4">
+                                    <InputLabel htmlFor="description" value="Full Description (Appears after 'Read More')" />
                                     <RichTextEditor
                                         value={data.description}
                                         onChange={(content) => setData('description', content)}
                                         className="mt-1"
-                                        placeholder="Describe your event..."
+                                        placeholder="Full detailed event description..."
                                     />
                                     <InputError message={errors.description} className="mt-2" />
                                 </div>

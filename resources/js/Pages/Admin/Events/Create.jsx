@@ -12,6 +12,7 @@ import FormBuilder from './FormBuilder';
 export default function Create({ auth }) {
     const { data, setData, post, processing, errors } = useForm({
         title: '',
+        short_description: '',
         cover_image: null,
         description: '',
         start_date: '',
@@ -97,12 +98,23 @@ export default function Create({ auth }) {
                                 </div>
 
                                 <div className="col-span-1 md:col-span-2">
-                                    <InputLabel htmlFor="description" value="Event Description & Details" />
+                                    <InputLabel htmlFor="short_description" value="Short Description (Appears before 'Read More')" />
+                                    <RichTextEditor
+                                        value={data.short_description}
+                                        onChange={(content) => setData('short_description', content)}
+                                        className="mt-1"
+                                        placeholder="Brief details about the event..."
+                                    />
+                                    <InputError message={errors.short_description} className="mt-2" />
+                                </div>
+
+                                <div className="col-span-1 md:col-span-2 mt-4">
+                                    <InputLabel htmlFor="description" value="Full Description (Appears after 'Read More')" />
                                     <RichTextEditor
                                         value={data.description}
                                         onChange={(content) => setData('description', content)}
                                         className="mt-1"
-                                        placeholder="Describe your event..."
+                                        placeholder="Full detailed event description..."
                                     />
                                     <InputError message={errors.description} className="mt-2" />
                                 </div>

@@ -8,6 +8,9 @@ import InputError from '@/Components/InputError';
 export default function Show({ auth, event }) {
     const { siteSettings = {} } = usePage().props;
     
+    // Description toggle
+    const [showFullDescription, setShowFullDescription] = useState(false);
+
     // Countdown logic
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
     const isFuture = event.start_date && new Date(event.start_date) > new Date();
@@ -233,7 +236,35 @@ export default function Show({ auth, event }) {
                                 <span className="w-8 h-1 bg-indigo-500 rounded-full inline-block"></span>
                                 About The Event
                             </h2>
-                            <div className="prose prose-invert prose-lg max-w-none text-gray-300 leading-relaxed space-y-4" dangerouslySetInnerHTML={{ __html: event.description || '' }} />
+                            {event.short_description && (
+                                <div className="prose prose-invert prose-lg max-w-none text-gray-300 leading-relaxed space-y-4" dangerouslySetInnerHTML={{ __html: event.short_description }} />
+                            )}
+                            
+                            {event.description && (
+                                <>
+                                    {!showFullDescription && event.short_description && (
+                                        <button 
+                                            onClick={() => setShowFullDescription(true)} 
+                                            className="mt-4 text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-2 transition"
+                                        >
+                                            Read More
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                                        </button>
+                                    )}
+                                    {(showFullDescription || !event.short_description) && (
+                                        <div className={`prose prose-invert prose-lg max-w-none text-gray-300 leading-relaxed space-y-4 ${event.short_description ? 'mt-4 pt-4 border-t border-gray-800/60' : ''}`} dangerouslySetInnerHTML={{ __html: event.description }} />
+                                    )}
+                                    {showFullDescription && event.short_description && (
+                                        <button 
+                                            onClick={() => setShowFullDescription(false)} 
+                                            className="mt-4 text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-2 transition"
+                                        >
+                                            Show Less
+                                            <svg className="w-4 h-4 transform rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                                        </button>
+                                    )}
+                                </>
+                            )}
                         </section>
 
                         {/* Registration Flow */}
