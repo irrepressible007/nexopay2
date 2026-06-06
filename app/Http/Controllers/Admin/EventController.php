@@ -43,6 +43,8 @@ class EventController extends Controller
 
         $validated['segments'] = $request->input('segments', []);
         $validated['form_schema'] = $request->input('form_schema', []);
+        $validated['ca_form_schema'] = $request->input('ca_form_schema', []);
+        $validated['volunteer_form_schema'] = $request->input('volunteer_form_schema', []);
 
         if ($request->hasFile('gallery_images')) {
             $images = [];
@@ -116,6 +118,8 @@ class EventController extends Controller
 
         $validated['segments'] = $request->input('segments', []);
         $validated['form_schema'] = $request->input('form_schema', []);
+        $validated['ca_form_schema'] = $request->input('ca_form_schema', []);
+        $validated['volunteer_form_schema'] = $request->input('volunteer_form_schema', []);
 
         if ($request->hasFile('gallery_images')) {
             $images = [];

@@ -7,6 +7,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import RichTextEditor from '@/Components/RichTextEditor';
 import SegmentBuilder from './SegmentBuilder';
+import FormBuilder from './FormBuilder';
 
 export default function Create({ auth }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -21,35 +22,14 @@ export default function Create({ auth }) {
         volunteer_price: 0,
         capacity: '',
         form_schema: [],
+        ca_form_schema: [],
+        volunteer_form_schema: [],
         segments: [],
         has_base_price: false,
         require_login: true,
     });
 
-    const [fieldLabel, setFieldLabel] = useState('');
-    const [fieldType, setFieldType] = useState('text');
-    const [fieldRequired, setFieldRequired] = useState(false);
-    const [fieldOptions, setFieldOptions] = useState('');
-
-    const addField = () => {
-        if (!fieldLabel) return;
-        const newField = {
-            name: fieldLabel.toLowerCase().replace(/[^a-z0-9]+/g, '_'),
-            label: fieldLabel,
-            type: fieldType,
-            required: fieldRequired,
-            ...(fieldType === 'select' && { options: fieldOptions.split(',').map(o => o.trim()).filter(Boolean) })
-        };
-        setData('form_schema', [...data.form_schema, newField]);
-        setFieldLabel('');
-        setFieldOptions('');
-    };
-
-    const removeField = (index) => {
-        const newSchema = [...data.form_schema];
-        newSchema.splice(index, 1);
-        setData('form_schema', newSchema);
-    };
+    const [activeFormTab, setActiveFormTab] = useState('participant');
 
     const submit = (e) => {
         e.preventDefault();
@@ -228,83 +208,65 @@ export default function Create({ auth }) {
 
                             <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
                                 <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Dynamic Registration Form Builder</h3>
-                                <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg mb-4 flex gap-4 items-end">
-                                    <div className="flex-1">
-                                        <InputLabel value="Field Label" />
-                                        <TextInput
-                                            type="text"
-                                            value={fieldLabel}
-                                            onChange={(e) => setFieldLabel(e.target.value)}
-                                            placeholder="e.g. T-Shirt Size, University Name"
-                                            className="mt-1 block w-full"
-                                        />
-                                    </div>
-                                    <div className="w-48">
-                                        <InputLabel value="Field Type" />
-                                        <select
-                                            value={fieldType}
-                                            onChange={(e) => setFieldType(e.target.value)}
-                                            className="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 rounded-md shadow-sm"
-                                        >
-                                            <option value="text">Text (Short)</option>
-                                            <option value="textarea">Textarea (Long)</option>
-                                            <option value="number">Number</option>
-                                            <option value="file">File Upload</option>
-                                            <option value="select">Dropdown (Select)</option>
-                                        </select>
-                                    </div>
-                                    {fieldType === 'select' && (
-                                        <div className="flex-1">
-                                            <InputLabel value="Dropdown Options" />
-                                            <TextInput
-                                                type="text"
-                                                value={fieldOptions}
-                                                onChange={(e) => setFieldOptions(e.target.value)}
-                                                placeholder="Comma separated: Small, Medium, Large"
-                                                className="mt-1 block w-full"
-                                            />
-                                        </div>
-                                    )}
-                                    <div className="w-32 flex items-center mb-2">
-                                        <input
-                                            type="checkbox"
-                                            checked={fieldRequired}
-                                            onChange={(e) => setFieldRequired(e.target.checked)}
-                                            className="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800 mr-2"
-                                        />
-                                        <span className="text-sm text-gray-600 dark:text-gray-400">Required</span>
-                                    </div>
+                                
+                                <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6">
                                     <button
                                         type="button"
-                                        onClick={addField}
-                                        className="bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700 transition"
+                                        onClick={() => setActiveFormTab('participant')}
+                                        className={`py-2 px-4 border-b-2 font-medium text-sm ${
+                                            activeFormTab === 'participant'
+                                                ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                                        }`}
                                     >
-                                        Add Field
+                                        Participant Form
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setActiveFormTab('ca')}
+                                        className={`py-2 px-4 border-b-2 font-medium text-sm ${
+                                            activeFormTab === 'ca'
+                                                ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                                        }`}
+                                    >
+                                        CA Form
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setActiveFormTab('volunteer')}
+                                        className={`py-2 px-4 border-b-2 font-medium text-sm ${
+                                            activeFormTab === 'volunteer'
+                                                ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                                        }`}
+                                    >
+                                        Volunteer Form
                                     </button>
                                 </div>
 
-                                {data.form_schema.length > 0 && (
-                                    <ul className="divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-                                        {data.form_schema.map((field, index) => (
-                                            <li key={index} className="p-4 flex justify-between items-center bg-white dark:bg-gray-800">
-                                                <div>
-                                                    <span className="font-bold text-gray-800 dark:text-gray-200">{field.label}</span>
-                                                    <span className="ml-2 text-sm text-gray-500">({field.type})</span>
-                                                    {field.required && <span className="ml-2 text-xs text-red-500 font-bold">*Required</span>}
-                                                    {field.type === 'select' && field.options && (
-                                                        <span className="ml-2 text-xs text-gray-400">Options: {field.options.join(', ')}</span>
-                                                    )}
-                                                </div>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeField(index)}
-                                                    className="text-red-500 hover:text-red-700 font-bold"
-                                                >
-                                                    Remove
-                                                </button>
-                                            </li>
-                                        ))}
-                                    </ul>
+                                {activeFormTab === 'participant' && (
+                                    <FormBuilder 
+                                        title="Participant Form Fields"
+                                        schema={data.form_schema} 
+                                        setSchema={(schema) => setData('form_schema', schema)} 
+                                    />
+                                )}
+                                
+                                {activeFormTab === 'ca' && (
+                                    <FormBuilder 
+                                        title="Campus Ambassador Form Fields"
+                                        schema={data.ca_form_schema} 
+                                        setSchema={(schema) => setData('ca_form_schema', schema)} 
+                                    />
+                                )}
+                                
+                                {activeFormTab === 'volunteer' && (
+                                    <FormBuilder 
+                                        title="Volunteer Form Fields"
+                                        schema={data.volunteer_form_schema} 
+                                        setSchema={(schema) => setData('volunteer_form_schema', schema)} 
+                                    />
                                 )}
                             </div>
 

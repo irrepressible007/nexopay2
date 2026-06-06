@@ -40,11 +40,16 @@ export default function Show({ auth, event }) {
         Volunteer: event.volunteer_price
     });
     
-    const schema = event.form_schema || [];
+    const activeSchema = selectedRole === 'Campus Ambassador' 
+        ? (event.ca_form_schema || []) 
+        : selectedRole === 'Volunteer' 
+            ? (event.volunteer_form_schema || []) 
+            : (event.form_schema || []);
+            
     const segments = event.segments || [];
     
     const initialFormData = {};
-    schema.forEach(field => {
+    activeSchema.forEach(field => {
         initialFormData[field.name] = auth?.user?.profile_data?.[field.name] || '';
     });
     
@@ -321,10 +326,10 @@ export default function Show({ auth, event }) {
                                                     </div>
                                                 </div>
 
-                                                {schema.length > 0 && (
-                                                    <div className="grid grid-cols-1 gap-6 mb-8">
-                                                        {schema.map(field => (
-                                                            <div key={field.name}>
+                                                {activeSchema.length > 0 && (
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                                        {activeSchema.map((field, index) => (
+                                                            <div key={index} className={field.type === 'textarea' ? 'md:col-span-2' : ''}>
                                                                 <InputLabel value={field.label + (field.required ? ' *' : '')} className="text-gray-300" />
                                                                 {field.type === 'textarea' ? (
                                                                     <textarea
