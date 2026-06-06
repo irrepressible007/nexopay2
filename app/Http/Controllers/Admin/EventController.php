@@ -37,6 +37,7 @@ class EventController extends Controller
             'volunteer_price' => 'required|numeric|min:0',
             'capacity' => 'nullable|integer|min:1',
             'has_base_price' => 'boolean',
+            'require_login' => 'boolean',
             'gallery_images' => 'nullable|array',
             'gallery_images.*' => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048'
@@ -113,6 +114,7 @@ class EventController extends Controller
             'volunteer_price' => 'required|numeric|min:0',
             'capacity' => 'nullable|integer|min:1',
             'has_base_price' => 'boolean',
+            'require_login' => 'boolean',
             'gallery_images' => 'nullable|array',
             'gallery_images.*' => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048'
@@ -139,6 +141,8 @@ class EventController extends Controller
             }
             // For update, we might want to merge with existing. For simplicity, we just replace.
             $validated['gallery_images'] = $images;
+        } else {
+            unset($validated['gallery_images']);
         }
 
         if ($request->hasFile('cover_image')) {
@@ -153,6 +157,8 @@ class EventController extends Controller
             $filename = uniqid() . '.webp';
             $manager->read($file->getRealPath())->toWebp(80)->save($directory . '/' . $filename);
             $validated['cover_image'] = '/storage/events/covers/' . $filename;
+        } else {
+            unset($validated['cover_image']);
         }
 
         $event->update($validated);

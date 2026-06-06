@@ -8,7 +8,7 @@ use Inertia\Inertia;
 Route::get('/', [\App\Http\Controllers\PublicEventController::class, 'index'])->name('home');
 Route::get('/events', [\App\Http\Controllers\PublicEventController::class, 'eventsIndex'])->name('events.index');
 Route::get('/event/{event:slug}', [\App\Http\Controllers\PublicEventController::class, 'show'])->name('event.show');
-Route::post('/event/{event:slug}/register', [\App\Http\Controllers\PublicEventController::class, 'register'])->name('event.register')->middleware('auth');
+Route::post('/event/{event:slug}/register', [\App\Http\Controllers\PublicEventController::class, 'register'])->name('event.register');
 
 // Public secure export route for Google Sheets (=IMPORTDATA)
 Route::get('/api/export/registrations', [\App\Http\Controllers\Admin\FinanceController::class, 'export'])->name('api.export.registrations');

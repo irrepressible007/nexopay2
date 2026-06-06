@@ -140,7 +140,7 @@ class PublicEventController extends Controller
             $user->update(['profile_data' => $updatedProfile]);
         }
 
-        Registration::create([
+        $registration = Registration::create([
             'user_id' => $user ? $user->id : null,
             'guest_name' => $request->guest_name,
             'guest_email' => $request->guest_email,
@@ -152,6 +152,11 @@ class PublicEventController extends Controller
             'selected_segments' => $selectedSegments,
             'payable_amount' => $total,
         ]);
+
+        $recipientEmail = $user ? $user->email : $request->guest_email;
+        if ($recipientEmail) {
+            \Illuminate\Support\Facades\Mail::to($recipientEmail)->send(new \App\Mail\RegistrationSubmitted($registration));
+        }
 
         if (!$user) {
             return redirect()->route('home')->with('success', 'Registration submitted! You will receive a confirmation email once approved.');
