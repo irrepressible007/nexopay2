@@ -89,7 +89,7 @@
                 <p class="qr-help">Please present this QR code at the entrance for scanning.</p>
                 
                 <div class="qr-code">
-                    <img src="{!! $message->embedData(SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(250)->generate($registration->qr_uuid), 'ticket-qr.png') !!}" alt="Entrance QR Code">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={{ urlencode($registration->qr_uuid) }}" alt="Entrance QR Code">
                 </div>
                 
                 <p style="font-family: monospace; font-size: 14px; background: #f3f4f6; padding: 10px; border-radius: 6px; color: #4b5563; display: inline-block;">
