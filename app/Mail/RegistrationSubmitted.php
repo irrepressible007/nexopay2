@@ -9,7 +9,9 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class RegistrationSubmitted extends Mailable
+use Illuminate\Contracts\Queue\ShouldQueue;
+
+class RegistrationSubmitted extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

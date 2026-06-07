@@ -11,7 +11,9 @@ use Illuminate\Queue\SerializesModels;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Mail\Mailables\Attachment;
 
-class RegistrationConfirmed extends Mailable
+use Illuminate\Contracts\Queue\ShouldQueue;
+
+class RegistrationConfirmed extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
