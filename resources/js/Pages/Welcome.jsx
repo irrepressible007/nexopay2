@@ -48,8 +48,16 @@ export default function Welcome({ auth, events, partners = [] }) {
                 {/* Background Ambient Glows */}
                 {!siteSettings.hero_image && (
                     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-                        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/30 blur-[150px] rounded-full" />
-                        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-600/30 blur-[150px] rounded-full" />
+                        <motion.div 
+                            animate={{ x: [0, 30, -20, 0], y: [0, -30, 20, 0], scale: [1, 1.1, 0.9, 1] }}
+                            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+                            className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/30 blur-[150px] rounded-full" 
+                        />
+                        <motion.div 
+                            animate={{ x: [0, -40, 20, 0], y: [0, 40, -20, 0], scale: [1, 1.2, 0.8, 1] }}
+                            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+                            className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-600/30 blur-[150px] rounded-full" 
+                        />
                     </div>
                 )}
 
@@ -107,7 +115,13 @@ export default function Welcome({ auth, events, partners = [] }) {
 
                     {/* Partners Marquee */}
                     {partners.length > 0 && (
-                        <section className="relative z-20 py-16 border-y border-white/5 bg-black/40 backdrop-blur-md overflow-hidden marquee-container">
+                        <motion.section 
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-50px" }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                            className="relative z-20 py-16 border-y border-white/5 bg-black/40 backdrop-blur-md overflow-hidden marquee-container"
+                        >
                             <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[#030712] to-transparent z-10 pointer-events-none" />
                             <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#030712] to-transparent z-10 pointer-events-none" />
                             
@@ -135,7 +149,7 @@ export default function Welcome({ auth, events, partners = [] }) {
                                     </a>
                                 ))}
                             </div>
-                        </section>
+                        </motion.section>
                     )}
 
                     {/* Events Showcase */}
@@ -170,8 +184,8 @@ export default function Welcome({ auth, events, partners = [] }) {
                                         <motion.div 
                                             key={event.id}
                                             variants={itemVariants}
-                                            whileHover={{ scale: 1.03 }}
-                                            className="group relative bg-[rgba(255,255,255,0.03)] backdrop-blur-xl rounded-3xl overflow-hidden border border-[rgba(255,255,255,0.1)] hover:border-indigo-500 transition-all duration-500 hover:shadow-[0_0_40px_rgba(99,102,241,0.2)] flex flex-col h-[500px]"
+                                            whileHover={{ y: -10, scale: 1.02 }}
+                                            className="group relative bg-[rgba(255,255,255,0.02)] backdrop-blur-xl rounded-3xl overflow-hidden border border-[rgba(255,255,255,0.05)] hover:border-indigo-500/50 hover:bg-[rgba(255,255,255,0.04)] transition-all duration-500 hover:shadow-[0_20px_40px_rgba(99,102,241,0.15)] flex flex-col h-[500px]"
                                         >
                                             <Link href={route('event.show', event.slug)} className="absolute inset-0 z-10" aria-label={`View ${event.title}`} />
                                             
