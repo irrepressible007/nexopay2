@@ -7,9 +7,8 @@ export default function Welcome({ auth, events, partners = [] }) {
     const { siteSettings = {} } = usePage().props;
     const { scrollYProgress } = useScroll();
     
-    // Parallax effect for the hero text
-    const yHero = useTransform(scrollYProgress, [0, 1], [0, 300]);
-    const opacityHero = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
+    // Subtle Parallax effect for the hero text
+    const yHero = useTransform(scrollYProgress, [0, 1], [0, 150]);
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -58,7 +57,7 @@ export default function Welcome({ auth, events, partners = [] }) {
 
                 <main className="flex-1">
                     {/* Cinematic Hero Section */}
-                    <section className="relative min-h-[90vh] flex items-center justify-center px-6 overflow-hidden">
+                    <section className="relative min-h-[75vh] md:min-h-[85vh] flex items-center justify-center px-6 overflow-hidden py-20">
                         
                         {siteSettings.hero_image && (
                             <div className="absolute inset-0 z-0 pointer-events-none">
@@ -76,7 +75,7 @@ export default function Welcome({ auth, events, partners = [] }) {
                         )}
 
                         <motion.div 
-                            style={{ y: yHero, opacity: opacityHero }}
+                            style={{ y: yHero }}
                             className="text-center max-w-5xl z-10"
                         >
                             <motion.h1 
