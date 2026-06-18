@@ -59,6 +59,9 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(
     Route::get('/analytics', [\App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('analytics.index');
     Route::get('/analytics/export/summary', [\App\Http\Controllers\Admin\AnalyticsController::class, 'exportSummary'])->name('analytics.export.summary');
     Route::get('/analytics/export/detailed', [\App\Http\Controllers\Admin\AnalyticsController::class, 'exportDetailed'])->name('analytics.export.detailed');
+
+    Route::get('/mails', [\App\Http\Controllers\Admin\MailController::class, 'index'])->name('mails.index');
+    Route::post('/mails/send', [\App\Http\Controllers\Admin\MailController::class, 'send'])->name('mails.send');
 });
 
 Route::get('/p/{slug}', [\App\Http\Controllers\PublicPageController::class, 'show'])->name('page.show');

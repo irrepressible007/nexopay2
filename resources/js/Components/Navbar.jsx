@@ -96,6 +96,7 @@ export default function Navbar() {
                                                 {route().has('admin.analytics.index') && (
                                                     <Dropdown.Link href={route('admin.analytics.index')}>Analytics & Reports</Dropdown.Link>
                                                 )}
+                                                <Dropdown.Link href={route('admin.mails.index')}>Mail Hub</Dropdown.Link>
                                                 <Dropdown.Link href={route('admin.settings.index')}>Site Settings</Dropdown.Link>
                                             </>
                                         )}
@@ -155,6 +156,7 @@ export default function Navbar() {
                                                 {route().has('admin.analytics.index') && (
                                                     <ResponsiveNavLink href={route('admin.analytics.index')}>Analytics & Reports</ResponsiveNavLink>
                                                 )}
+                                                <ResponsiveNavLink href={route('admin.mails.index')}>Mail Hub</ResponsiveNavLink>
                                                 <ResponsiveNavLink href={route('admin.settings.index')}>Site Settings</ResponsiveNavLink>
                                             </>
                                         )}
