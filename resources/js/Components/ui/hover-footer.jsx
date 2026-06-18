@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import { motion } from "motion/react";
+import { motion, useScroll, useTransform } from "motion/react";
 import { cn } from "@/lib/utils";
 
 export const TextHoverEffect = ({
@@ -12,6 +12,15 @@ export const TextHoverEffect = ({
   const [cursor, setCursor] = useState({ x: 0, y: 0 });
   const [hovered, setHovered] = useState(false);
   const [maskPosition, setMaskPosition] = useState({ cx: "50%", cy: "50%" });
+
+  // Track scroll position to draw the text as the user scrolls
+  const { scrollYProgress } = useScroll({
+    target: svgRef,
+    offset: ["start end", "end end"]
+  });
+  
+  // Transform scroll progress into the strokeDashoffset
+  const dashoffset = useTransform(scrollYProgress, [0, 1], [1000, 0]);
 
   useEffect(() => {
     if (svgRef.current && cursor.x !== null && cursor.y !== null) {
@@ -83,7 +92,7 @@ export const TextHoverEffect = ({
         textAnchor="middle"
         dominantBaseline="middle"
         strokeWidth="0.3"
-        className="fill-transparent stroke-neutral-200 font-[helvetica] text-7xl font-bold dark:stroke-neutral-800"
+        className="fill-transparent stroke-neutral-200 font-[helvetica] text-7xl font-bold dark:stroke-neutral-800 transition-opacity duration-300"
         style={{ opacity: hovered ? 0.7 : 0 }}
       >
         {text}
@@ -95,14 +104,9 @@ export const TextHoverEffect = ({
         dominantBaseline="middle"
         strokeWidth="0.3"
         className="fill-transparent stroke-[#3ca2fa] font-[helvetica] text-7xl font-bold dark:stroke-[#3ca2fa99]"
-        initial={{ strokeDashoffset: 1000, strokeDasharray: 1000 }}
-        animate={{
-          strokeDashoffset: 0,
+        style={{
           strokeDasharray: 1000,
-        }}
-        transition={{
-          duration: 4,
-          ease: "easeInOut",
+          strokeDashoffset: dashoffset,
         }}
       >
         {text}
