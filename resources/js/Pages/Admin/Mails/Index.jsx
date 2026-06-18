@@ -68,8 +68,8 @@ export default function MailHub({ stats, logs }) {
                 {/* Compose Modal */}
                 {isComposeOpen && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                        <div className="bg-[#0f172a] border border-white/10 rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-                            <div className="flex justify-between items-center p-4 border-b border-white/10 bg-white/5">
+                        <div className="bg-[#0f172a] border border-white/10 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl animate-in fade-in zoom-in duration-200">
+                            <div className="flex justify-between items-center p-4 border-b border-white/10 bg-white/5 sticky top-0 z-10">
                                 <h3 className="text-lg font-bold text-white">Compose Custom Mail</h3>
                                 <button onClick={() => setIsComposeOpen(false)} className="text-gray-400 hover:text-white">&times;</button>
                             </div>
