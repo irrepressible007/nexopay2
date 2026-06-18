@@ -32,8 +32,8 @@ export default function Footer() {
     ];
 
     return (
-        <footer className="bg-[#0F0F11]/10 relative h-fit rounded-3xl overflow-hidden m-8">
-            <div className="max-w-7xl mx-auto p-14 z-40 relative">
+        <footer className="bg-[#0F0F11]/10 relative h-fit rounded-3xl overflow-hidden m-8 z-0">
+            <div className="max-w-7xl mx-auto p-14 z-10 relative">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-8 lg:gap-16 pb-12">
                     {/* Brand section */}
                     <div className="flex flex-col space-y-4">
@@ -128,7 +128,7 @@ export default function Footer() {
             </div>
 
             {/* Text hover effect */}
-            <div className="lg:flex hidden h-[30rem] -mt-52 -mb-36 relative z-50">
+            <div className="lg:flex hidden h-[30rem] -mt-52 -mb-36 relative z-20">
                 <TextHoverEffect text={appName.toUpperCase()} />
             </div>
 
