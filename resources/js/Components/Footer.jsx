@@ -32,9 +32,9 @@ export default function Footer() {
     ];
 
     return (
-        <footer className="bg-[#0F0F11]/10 relative h-fit rounded-3xl overflow-hidden m-8 z-0">
-            <div className="max-w-7xl mx-auto p-14 z-10 relative">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-8 lg:gap-16 pb-12">
+        <footer className="bg-[#0F0F11]/10 relative h-fit rounded-3xl overflow-hidden m-4 md:m-8 z-0">
+            <div className="max-w-7xl mx-auto p-8 md:p-14 z-10 relative">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 lg:gap-16 pb-8 md:pb-12">
                     {/* Brand section */}
                     <div className="flex flex-col space-y-4">
                         <Link href="/" className="flex items-center space-x-2">
@@ -55,7 +55,7 @@ export default function Footer() {
 
                     {/* Resources (CMS Pages) */}
                     <div>
-                        <h4 className="text-white text-lg font-semibold mb-6">Resources</h4>
+                        <h4 className="text-white text-lg font-semibold mb-4 md:mb-6">Resources</h4>
                         <ul className="space-y-3">
                             {navPages && navPages.length > 0 ? (
                                 navPages.map((page, index) => (
@@ -73,7 +73,7 @@ export default function Footer() {
 
                     {/* Connect With Us (Dynamic Links) */}
                     <div>
-                        <h4 className="text-white text-lg font-semibold mb-6">Connect With Us</h4>
+                        <h4 className="text-white text-lg font-semibold mb-4 md:mb-6">Connect With Us</h4>
                         <ul className="space-y-3">
                             {footerLinks.length > 0 ? (
                                 footerLinks.map((link, index) => (
@@ -93,17 +93,17 @@ export default function Footer() {
 
                     {/* Contact section */}
                     <div>
-                        <h4 className="text-white text-lg font-semibold mb-6">Contact Us</h4>
+                        <h4 className="text-white text-lg font-semibold mb-4 md:mb-6">Contact Us</h4>
                         <ul className="space-y-4">
                             {contactInfo.map((item, i) => (
-                                <li key={i} className="flex items-center space-x-3 text-gray-400">
-                                    {item.icon}
+                                <li key={i} className="flex items-start md:items-center space-x-3 text-gray-400">
+                                    <div className="mt-1 md:mt-0 flex-shrink-0">{item.icon}</div>
                                     {item.href ? (
-                                        <a href={item.href} className="hover:text-[#3ca2fa] transition-colors">
+                                        <a href={item.href} className="hover:text-[#3ca2fa] transition-colors break-all md:break-normal">
                                             {item.text}
                                         </a>
                                     ) : (
-                                        <span className="hover:text-[#3ca2fa] transition-colors">
+                                        <span className="hover:text-[#3ca2fa] transition-colors break-all md:break-normal">
                                             {item.text}
                                         </span>
                                     )}
@@ -128,7 +128,7 @@ export default function Footer() {
             </div>
 
             {/* Text hover effect */}
-            <div className="lg:flex hidden h-[30rem] -mt-52 -mb-36 relative z-20">
+            <div className="flex h-40 md:h-64 lg:h-[30rem] -mt-12 md:-mt-24 lg:-mt-52 -mb-8 md:-mb-16 lg:-mb-36 relative z-20 pointer-events-none md:pointer-events-auto">
                 <TextHoverEffect text={appName.toUpperCase()} />
             </div>
 
