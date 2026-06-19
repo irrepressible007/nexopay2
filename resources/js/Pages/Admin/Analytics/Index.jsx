@@ -287,7 +287,7 @@ export default function AnalyticsIndex({ auth, events, selectedEventId, stats, r
 
             {/* Participant Details Modal */}
             <Modal show={selectedParticipant !== null} onClose={() => setSelectedParticipant(null)} maxWidth="2xl">
-                <div className="p-6">
+                <div className="p-6 bg-white dark:bg-gray-900 w-full h-full">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
                             Participant Details
@@ -354,9 +354,11 @@ export default function AnalyticsIndex({ auth, events, selectedEventId, stats, r
                                     <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Form Responses</h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {Object.entries(selectedParticipant.form_data).map(([key, value]) => (
-                                            <div key={key} className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
-                                                <div className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">{key}</div>
-                                                <div className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap">
+                                            <div key={key} className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 h-full">
+                                                <div className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                                                    {key.replace(/_/g, ' ')}
+                                                </div>
+                                                <div className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">
                                                     {Array.isArray(value) ? value.join(', ') : (value || '-')}
                                                 </div>
                                             </div>
