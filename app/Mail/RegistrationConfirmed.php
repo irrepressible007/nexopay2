@@ -13,7 +13,7 @@ use Illuminate\Mail\Mailables\Attachment;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class RegistrationConfirmed extends Mailable implements ShouldQueue
+class RegistrationConfirmed extends Mailable
 {
     use Queueable, SerializesModels;
 

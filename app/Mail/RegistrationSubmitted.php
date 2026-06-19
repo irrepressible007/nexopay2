@@ -11,7 +11,7 @@ use Illuminate\Queue\SerializesModels;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class RegistrationSubmitted extends Mailable implements ShouldQueue
+class RegistrationSubmitted extends Mailable
 {
     use Queueable, SerializesModels;
 

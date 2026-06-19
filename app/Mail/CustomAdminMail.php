@@ -11,7 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Headers;
 
-class CustomAdminMail extends Mailable implements ShouldQueue
+class CustomAdminMail extends Mailable
 {
     use Queueable, SerializesModels;
 
