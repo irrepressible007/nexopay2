@@ -53,6 +53,7 @@ export default function FormBuilder({ title, schema, setSchema }) {
                         <option value="text">Text (Short)</option>
                         <option value="textarea">Textarea (Long)</option>
                         <option value="number">Number</option>
+                        <option value="date">Date Picker (Calendar)</option>
                         <option value="file">File Upload</option>
                         <option value="select">Dropdown (Select)</option>
                     </select>

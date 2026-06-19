@@ -1,10 +1,13 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
+import Modal from '@/Components/Modal';
+import SecondaryButton from '@/Components/SecondaryButton';
 
 export default function AnalyticsIndex({ auth, events, selectedEventId, stats, registrations = [], dynamicColumns = [] }) {
     const [eventId, setEventId] = useState(selectedEventId || '');
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedParticipant, setSelectedParticipant] = useState(null);
 
     const handleFilterChange = (e) => {
         const value = e.target.value;
@@ -225,8 +228,12 @@ export default function AnalyticsIndex({ auth, events, selectedEventId, stats, r
                                 <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
                                     {filteredRegistrations.length > 0 ? (
                                         filteredRegistrations.map(reg => (
-                                            <tr key={reg.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
-                                                <td className="px-4 py-3 text-gray-900 dark:text-gray-100 sticky left-0 bg-white dark:bg-gray-900 shadow-[1px_0_0_0_#e5e7eb] dark:shadow-[1px_0_0_0_#374151] font-medium">
+                                            <tr 
+                                                key={reg.id} 
+                                                onClick={() => setSelectedParticipant(reg)}
+                                                className="hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition cursor-pointer"
+                                            >
+                                                <td className="px-4 py-3 text-gray-900 dark:text-gray-100 sticky left-0 bg-white dark:bg-gray-900 shadow-[1px_0_0_0_#e5e7eb] dark:shadow-[1px_0_0_0_#374151] font-medium group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/30 transition">
                                                     {reg.user ? reg.user.name : reg.guest_name} {reg.user ? '' : <span className="text-xs text-gray-500 font-normal ml-1">(Guest)</span>}
                                                 </td>
                                                 <td className="px-4 py-3 text-gray-600 dark:text-gray-400">
@@ -277,6 +284,94 @@ export default function AnalyticsIndex({ auth, events, selectedEventId, stats, r
 
                 </div>
             </div>
+
+            {/* Participant Details Modal */}
+            <Modal show={selectedParticipant !== null} onClose={() => setSelectedParticipant(null)} maxWidth="2xl">
+                <div className="p-6">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                            Participant Details
+                        </h2>
+                        <button onClick={() => setSelectedParticipant(null)} className="text-gray-400 hover:text-gray-500">
+                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    {selectedParticipant && (
+                        <div className="space-y-6">
+                            {/* Core Details */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Name</div>
+                                    <div className="text-base text-gray-900 dark:text-gray-100 font-semibold">
+                                        {selectedParticipant.user ? selectedParticipant.user.name : selectedParticipant.guest_name}
+                                        {!selectedParticipant.user && <span className="ml-2 text-xs text-indigo-500 font-normal border border-indigo-200 dark:border-indigo-800 px-2 py-0.5 rounded-full">Guest</span>}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</div>
+                                    <div className="text-base text-gray-900 dark:text-gray-100">
+                                        {selectedParticipant.user ? selectedParticipant.user.email : selectedParticipant.guest_email}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Role</div>
+                                    <div className="text-base text-gray-900 dark:text-gray-100 capitalize">
+                                        {selectedParticipant.role?.name || 'N/A'}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Status</div>
+                                    <div className="text-base">
+                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                            selectedParticipant.status === 'approved' ? 'bg-green-100 text-green-800' : 
+                                            selectedParticipant.status === 'rejected' ? 'bg-red-100 text-red-800' : 
+                                            'bg-yellow-100 text-yellow-800'
+                                        }`}>
+                                            {selectedParticipant.status}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Transaction ID</div>
+                                    <div className="text-base text-gray-900 dark:text-gray-100 font-mono">
+                                        {selectedParticipant.bkash_txid || 'N/A'}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Amount Paid</div>
+                                    <div className="text-base text-indigo-600 dark:text-indigo-400 font-bold">
+                                        ৳{selectedParticipant.payable_amount}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Dynamic Form Data */}
+                            {selectedParticipant.form_data && Object.keys(selectedParticipant.form_data).length > 0 && (
+                                <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Form Responses</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {Object.entries(selectedParticipant.form_data).map(([key, value]) => (
+                                            <div key={key} className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+                                                <div className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">{key}</div>
+                                                <div className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap">
+                                                    {Array.isArray(value) ? value.join(', ') : (value || '-')}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="mt-6 flex justify-end">
+                                <SecondaryButton onClick={() => setSelectedParticipant(null)}>Close</SecondaryButton>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </Modal>
         </AuthenticatedLayout>
     );
 }
