@@ -7,32 +7,76 @@ export default function FormBuilder({ title, schema, setSchema }) {
     const [fieldType, setFieldType] = useState('text');
     const [fieldRequired, setFieldRequired] = useState(false);
     const [fieldOptions, setFieldOptions] = useState('');
+    const [editingIndex, setEditingIndex] = useState(null);
 
-    const addField = () => {
+    const saveField = () => {
         if (!fieldLabel) return;
-        const newField = {
+        const updatedField = {
             name: fieldLabel.toLowerCase().replace(/[^a-z0-9]+/g, '_'),
             label: fieldLabel,
             type: fieldType,
             required: fieldRequired,
             ...(fieldType === 'select' && { options: fieldOptions.split(',').map(o => o.trim()).filter(Boolean) })
         };
-        setSchema([...schema, newField]);
+
+        if (editingIndex !== null) {
+            const newSchema = [...schema];
+            newSchema[editingIndex] = updatedField;
+            setSchema(newSchema);
+            setEditingIndex(null);
+        } else {
+            setSchema([...schema, updatedField]);
+        }
+        
         setFieldLabel('');
         setFieldOptions('');
+        setFieldType('text');
+        setFieldRequired(false);
+    };
+
+    const editField = (index) => {
+        const field = schema[index];
+        setFieldLabel(field.label);
+        setFieldType(field.type);
+        setFieldRequired(field.required || false);
+        setFieldOptions(field.options ? field.options.join(', ') : '');
+        setEditingIndex(index);
+        
+        // Scroll to top of form builder so user sees the input
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const cancelEdit = () => {
+        setEditingIndex(null);
+        setFieldLabel('');
+        setFieldOptions('');
+        setFieldType('text');
+        setFieldRequired(false);
     };
 
     const removeField = (index) => {
         const newSchema = [...schema];
         newSchema.splice(index, 1);
         setSchema(newSchema);
+        if (editingIndex === index) {
+            cancelEdit();
+        } else if (editingIndex !== null && editingIndex > index) {
+            setEditingIndex(editingIndex - 1);
+        }
     };
 
     return (
         <div className="mb-8 border border-gray-200 dark:border-gray-700 rounded-lg p-6 bg-white dark:bg-gray-800 shadow-sm">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">{title}</h3>
+            <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">{title}</h3>
+                {editingIndex !== null && (
+                    <span className="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-1 rounded-md dark:bg-amber-900/50 dark:text-amber-400">
+                        Editing Mode Active
+                    </span>
+                )}
+            </div>
             
-            <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg mb-4 flex flex-wrap gap-4 items-end">
+            <div className={`p-4 rounded-lg mb-4 flex flex-wrap gap-4 items-end transition-all ${editingIndex !== null ? 'bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800' : 'bg-gray-50 dark:bg-gray-900/50 border border-transparent'}`}>
                 <div className="flex-1 min-w-[200px]">
                     <InputLabel value="Field Label" />
                     <TextInput
@@ -79,19 +123,30 @@ export default function FormBuilder({ title, schema, setSchema }) {
                     />
                     <span className="text-sm text-gray-600 dark:text-gray-400">Required</span>
                 </div>
-                <button
-                    type="button"
-                    onClick={addField}
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-indigo-700 transition"
-                >
-                    Add Field
-                </button>
+                <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+                    <button
+                        type="button"
+                        onClick={saveField}
+                        className={`${editingIndex !== null ? 'bg-amber-500 hover:bg-amber-600 shadow-[0_0_10px_rgba(245,158,11,0.3)]' : 'bg-indigo-600 hover:bg-indigo-700'} text-white px-4 py-2 rounded-lg shadow-sm transition w-full sm:w-auto font-bold`}
+                    >
+                        {editingIndex !== null ? 'Update Field' : 'Add Field'}
+                    </button>
+                    {editingIndex !== null && (
+                        <button
+                            type="button"
+                            onClick={cancelEdit}
+                            className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg shadow-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition font-bold"
+                        >
+                            Cancel
+                        </button>
+                    )}
+                </div>
             </div>
 
             {schema.length > 0 ? (
                 <ul className="divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
                     {schema.map((field, index) => (
-                        <li key={index} className="p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                        <li key={index} className={`p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 transition-colors ${editingIndex === index ? 'bg-amber-50/50 dark:bg-amber-900/10' : ''}`}>
                             <div>
                                 <span className="font-bold text-gray-800 dark:text-gray-200">{field.label}</span>
                                 <span className="ml-2 text-sm text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
@@ -108,13 +163,22 @@ export default function FormBuilder({ title, schema, setSchema }) {
                                     </div>
                                 )}
                             </div>
-                            <button
-                                type="button"
-                                onClick={() => removeField(index)}
-                                className="text-red-600 hover:text-red-800 dark:text-red-500 dark:hover:text-red-400 font-bold text-sm px-3 py-1 border border-red-200 dark:border-red-900/50 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                            >
-                                Remove
-                            </button>
+                            <div className="flex gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => editField(index)}
+                                    className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 font-bold text-sm px-3 py-1 border border-indigo-200 dark:border-indigo-900/50 rounded-md hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => removeField(index)}
+                                    className="text-red-600 hover:text-red-800 dark:text-red-500 dark:hover:text-red-400 font-bold text-sm px-3 py-1 border border-red-200 dark:border-red-900/50 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                >
+                                    Remove
+                                </button>
+                            </div>
                         </li>
                     ))}
                 </ul>
