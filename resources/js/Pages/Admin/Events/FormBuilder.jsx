@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 
@@ -8,6 +8,7 @@ export default function FormBuilder({ title, schema, setSchema }) {
     const [fieldRequired, setFieldRequired] = useState(false);
     const [fieldOptions, setFieldOptions] = useState('');
     const [editingIndex, setEditingIndex] = useState(null);
+    const formBuilderRef = useRef(null);
 
     const saveField = () => {
         if (!fieldLabel) return;
@@ -42,8 +43,10 @@ export default function FormBuilder({ title, schema, setSchema }) {
         setFieldOptions(field.options ? field.options.join(', ') : '');
         setEditingIndex(index);
         
-        // Scroll to top of form builder so user sees the input
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Scroll to the form builder section specifically
+        if (formBuilderRef.current) {
+            formBuilderRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
     };
 
     const cancelEdit = () => {
@@ -66,7 +69,7 @@ export default function FormBuilder({ title, schema, setSchema }) {
     };
 
     return (
-        <div className="mb-8 border border-gray-200 dark:border-gray-700 rounded-lg p-6 bg-white dark:bg-gray-800 shadow-sm">
+        <div ref={formBuilderRef} className="mb-8 border border-gray-200 dark:border-gray-700 rounded-lg p-6 bg-white dark:bg-gray-800 shadow-sm">
             <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white">{title}</h3>
                 {editingIndex !== null && (
