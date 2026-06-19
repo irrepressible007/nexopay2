@@ -84,6 +84,7 @@ export default function MailHub({ stats, logs }) {
                                     >
                                         <option value="support@nexopay.com.bd">support@nexopay.com.bd</option>
                                         <option value="hello@nexopay.com.bd">hello@nexopay.com.bd</option>
+                                        <option value="nsc@nexopay.com.bd">nsc@nexopay.com.bd</option>
                                         <option value="no-reply@nexopay.com.bd">no-reply@nexopay.com.bd</option>
                                     </select>
                                 </div>
