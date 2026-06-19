@@ -40,45 +40,56 @@ export default function Dashboard({ auth, metrics, siteSettings }) {
                             <div className="text-gray-900 dark:text-gray-100 mb-4">
                                 Welcome to the Admin Hub! Manage your events and registrations here.
                             </div>
-                            <Link
-                                href={route('admin.events.index')}
-                                className="bg-indigo-600 text-center text-white px-4 py-2 rounded shadow hover:bg-indigo-700 transition"
-                            >
-                                Manage Events
-                            </Link>
+                            {auth.user.global_role === 'Admin' ? (
+                                <Link
+                                    href={route('admin.events.index')}
+                                    className="bg-indigo-600 text-center text-white px-4 py-2 rounded shadow hover:bg-indigo-700 transition"
+                                >
+                                    Manage Events
+                                </Link>
+                            ) : (
+                                <Link
+                                    href={route('admin.finance.index')}
+                                    className="bg-indigo-600 text-center text-white px-4 py-2 rounded shadow hover:bg-indigo-700 transition"
+                                >
+                                    Manage Registrations
+                                </Link>
+                            )}
                         </div>
 
-                        {/* Theme Customizer */}
-                        <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Theme Customization</h3>
-                            <p className="text-sm text-gray-500 mb-4">Set the primary color for the platform. You can pick a color visually or enter a hex code.</p>
-                            <form onSubmit={(e) => {
-                                e.preventDefault();
-                                router.post(route('admin.settings.update'), {
-                                    primary_color: primaryColor
-                                });
-                            }} className="flex gap-4 items-end">
-                                <div className="flex-1">
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Primary Color</label>
-                                    <div className="flex items-center gap-3">
-                                        <input 
-                                            type="color" 
-                                            value={primaryColor}
-                                            onChange={(e) => setPrimaryColor(e.target.value)}
-                                            className="h-10 w-14 cursor-pointer rounded border border-gray-300 bg-white p-1"
-                                        />
-                                        <input 
-                                            type="text" 
-                                            value={primaryColor}
-                                            onChange={(e) => setPrimaryColor(e.target.value)}
-                                            placeholder="e.g. #4f46e5"
-                                            className="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm flex-1"
-                                        />
+                        {/* Theme Customizer - Only visible to Admins */}
+                        {auth.user.global_role === 'Admin' && (
+                            <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Theme Customization</h3>
+                                <p className="text-sm text-gray-500 mb-4">Set the primary color for the platform. You can pick a color visually or enter a hex code.</p>
+                                <form onSubmit={(e) => {
+                                    e.preventDefault();
+                                    router.post(route('admin.settings.update'), {
+                                        primary_color: primaryColor
+                                    });
+                                }} className="flex gap-4 items-end">
+                                    <div className="flex-1">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Primary Color</label>
+                                        <div className="flex items-center gap-3">
+                                            <input 
+                                                type="color" 
+                                                value={primaryColor}
+                                                onChange={(e) => setPrimaryColor(e.target.value)}
+                                                className="h-10 w-14 cursor-pointer rounded border border-gray-300 bg-white p-1"
+                                            />
+                                            <input 
+                                                type="text" 
+                                                value={primaryColor}
+                                                onChange={(e) => setPrimaryColor(e.target.value)}
+                                                placeholder="e.g. #4f46e5"
+                                                className="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm flex-1"
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                                <button type="submit" className="bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-900 px-4 py-2 rounded shadow hover:bg-gray-700 transition">Save</button>
-                            </form>
-                        </div>
+                                    <button type="submit" className="bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-900 px-4 py-2 rounded shadow hover:bg-gray-700 transition">Save</button>
+                                </form>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

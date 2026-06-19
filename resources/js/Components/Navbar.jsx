@@ -86,20 +86,26 @@ export default function Navbar() {
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
-                                        {user.global_role === 'Admin' && (
+                                        {(user.global_role === 'Admin' || user.global_role === 'Finance') && (
                                             <>
-                                                <Dropdown.Link href={route('admin.dashboard')}>Events Dashboard</Dropdown.Link>
+                                                <Dropdown.Link href={route('admin.dashboard')}>Dashboard</Dropdown.Link>
                                                 <Dropdown.Link href={route('admin.finance.index')}>Finance & Registrations</Dropdown.Link>
-                                                <Dropdown.Link href={route('admin.partners.index')}>Partners</Dropdown.Link>
-                                                <Dropdown.Link href={route('admin.pages.index')}>CMS Pages</Dropdown.Link>
-                                                <Dropdown.Link href={route('admin.checkin.index')}>QR Check-in</Dropdown.Link>
                                                 {route().has('admin.analytics.index') && (
                                                     <Dropdown.Link href={route('admin.analytics.index')}>Analytics & Reports</Dropdown.Link>
                                                 )}
-                                                {route().has('admin.mails.index') && (
-                                                    <Dropdown.Link href={route('admin.mails.index')}>Mail Hub</Dropdown.Link>
+                                                
+                                                {user.global_role === 'Admin' && (
+                                                    <>
+                                                        <Dropdown.Link href={route('admin.events.index')}>Events Manager</Dropdown.Link>
+                                                        <Dropdown.Link href={route('admin.partners.index')}>Partners</Dropdown.Link>
+                                                        <Dropdown.Link href={route('admin.pages.index')}>CMS Pages</Dropdown.Link>
+                                                        <Dropdown.Link href={route('admin.checkin.index')}>QR Check-in</Dropdown.Link>
+                                                        {route().has('admin.mails.index') && (
+                                                            <Dropdown.Link href={route('admin.mails.index')}>Mail Hub</Dropdown.Link>
+                                                        )}
+                                                        <Dropdown.Link href={route('admin.settings.index')}>Site Settings</Dropdown.Link>
+                                                    </>
                                                 )}
-                                                <Dropdown.Link href={route('admin.settings.index')}>Site Settings</Dropdown.Link>
                                             </>
                                         )}
                                         <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link>
@@ -148,20 +154,26 @@ export default function Navbar() {
                                         <div className="text-sm font-medium text-indigo-400">{user.email}</div>
                                     </div>
                                     <div className="mt-3 space-y-1">
-                                        {user.global_role === 'Admin' && (
+                                        {(user.global_role === 'Admin' || user.global_role === 'Finance') && (
                                             <>
-                                                <ResponsiveNavLink href={route('admin.dashboard')}>Events Dashboard</ResponsiveNavLink>
+                                                <ResponsiveNavLink href={route('admin.dashboard')}>Dashboard</ResponsiveNavLink>
                                                 <ResponsiveNavLink href={route('admin.finance.index')}>Finance & Registrations</ResponsiveNavLink>
-                                                <ResponsiveNavLink href={route('admin.partners.index')}>Partners</ResponsiveNavLink>
-                                                <ResponsiveNavLink href={route('admin.pages.index')}>CMS Pages</ResponsiveNavLink>
-                                                <ResponsiveNavLink href={route('admin.checkin.index')}>QR Check-in</ResponsiveNavLink>
                                                 {route().has('admin.analytics.index') && (
                                                     <ResponsiveNavLink href={route('admin.analytics.index')}>Analytics & Reports</ResponsiveNavLink>
                                                 )}
-                                                {route().has('admin.mails.index') && (
-                                                    <ResponsiveNavLink href={route('admin.mails.index')}>Mail Hub</ResponsiveNavLink>
+                                                
+                                                {user.global_role === 'Admin' && (
+                                                    <>
+                                                        <ResponsiveNavLink href={route('admin.events.index')}>Events Manager</ResponsiveNavLink>
+                                                        <ResponsiveNavLink href={route('admin.partners.index')}>Partners</ResponsiveNavLink>
+                                                        <ResponsiveNavLink href={route('admin.pages.index')}>CMS Pages</ResponsiveNavLink>
+                                                        <ResponsiveNavLink href={route('admin.checkin.index')}>QR Check-in</ResponsiveNavLink>
+                                                        {route().has('admin.mails.index') && (
+                                                            <ResponsiveNavLink href={route('admin.mails.index')}>Mail Hub</ResponsiveNavLink>
+                                                        )}
+                                                        <ResponsiveNavLink href={route('admin.settings.index')}>Site Settings</ResponsiveNavLink>
+                                                    </>
                                                 )}
-                                                <ResponsiveNavLink href={route('admin.settings.index')}>Site Settings</ResponsiveNavLink>
                                             </>
                                         )}
                                         <ResponsiveNavLink href={route('profile.edit')}>Profile</ResponsiveNavLink>

@@ -109,7 +109,9 @@ class FinanceController extends Controller
         // Since we are using IMPORTDATA, we might want a signed URL or a secret token instead of auth middleware.
         // Let's implement a secret token approach for the Google Sheets API.
         $token = $request->query('token');
-        if ($token !== config('app.key')) {
+        $expectedToken = env('EXPORT_TOKEN');
+        
+        if (empty($expectedToken) || $token !== $expectedToken) {
             abort(403, 'Unauthorized export request.');
         }
 

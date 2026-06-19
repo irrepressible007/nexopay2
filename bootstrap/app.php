@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'is_admin' => \App\Http\Middleware\IsAdmin::class,
+            'has_dashboard_access' => \App\Http\Middleware\HasDashboardAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

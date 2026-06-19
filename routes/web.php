@@ -35,15 +35,14 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
+});
+
+Route::middleware(['auth', 'is_admin'])->group(function () {
     Route::post('/api/upload-image', [\App\Http\Controllers\ImageUploadController::class, 'store'])->name('api.upload.image');
 });
 
-Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'has_dashboard_access'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');
-    Route::post('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
-    Route::resource('events', \App\Http\Controllers\Admin\EventController::class);
-    Route::resource('partners', \App\Http\Controllers\Admin\PartnerController::class)->except(['create', 'show', 'edit']);
     
     Route::get('/finance', [\App\Http\Controllers\Admin\FinanceController::class, 'index'])->name('finance.index');
     Route::post('/finance/{registration}/approve', [\App\Http\Controllers\Admin\FinanceController::class, 'approve'])->name('finance.approve');
@@ -51,15 +50,22 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(
     Route::post('/finance/{registration}/resend', [\App\Http\Controllers\Admin\FinanceController::class, 'resend'])->name('finance.resend');
     Route::delete('/finance/{registration}', [\App\Http\Controllers\Admin\FinanceController::class, 'destroy'])->name('finance.destroy');
 
+    Route::get('/analytics', [\App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('analytics.index');
+    Route::get('/analytics/export/summary', [\App\Http\Controllers\Admin\AnalyticsController::class, 'exportSummary'])->name('analytics.export.summary');
+    Route::get('/analytics/export/detailed', [\App\Http\Controllers\Admin\AnalyticsController::class, 'exportDetailed'])->name('analytics.export.detailed');
+});
+
+Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');
+    Route::post('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
+    Route::resource('events', \App\Http\Controllers\Admin\EventController::class);
+    Route::resource('partners', \App\Http\Controllers\Admin\PartnerController::class)->except(['create', 'show', 'edit']);
+    
     Route::get('/checkin', [\App\Http\Controllers\Admin\CheckInController::class, 'index'])->name('checkin.index');
     Route::post('/checkin', [\App\Http\Controllers\Admin\CheckInController::class, 'process'])->name('checkin.process');
     
     Route::resource('pages', \App\Http\Controllers\Admin\PageController::class)->except('show');
     
-    Route::get('/analytics', [\App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('analytics.index');
-    Route::get('/analytics/export/summary', [\App\Http\Controllers\Admin\AnalyticsController::class, 'exportSummary'])->name('analytics.export.summary');
-    Route::get('/analytics/export/detailed', [\App\Http\Controllers\Admin\AnalyticsController::class, 'exportDetailed'])->name('analytics.export.detailed');
-
     Route::get('/mails', [\App\Http\Controllers\Admin\MailController::class, 'index'])->name('mails.index');
     Route::post('/mails/send', [\App\Http\Controllers\Admin\MailController::class, 'send'])->name('mails.send');
 });
