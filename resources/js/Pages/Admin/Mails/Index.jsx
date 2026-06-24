@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm, usePage, router } from '@inertiajs/react';
+import RichTextEditor from '@/Components/RichTextEditor';
 
 export default function MailHub({ stats, logs }) {
     const { auth } = usePage().props;
@@ -115,14 +116,13 @@ export default function MailHub({ stats, logs }) {
                                     {errors.subject && <p className="text-red-400 text-xs mt-1">{errors.subject}</p>}
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">Message (HTML Supported)</label>
-                                    <textarea
+                                <div className="text-gray-900">
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">Message</label>
+                                    <RichTextEditor
                                         value={data.message}
-                                        onChange={e => setData('message', e.target.value)}
-                                        className="w-full bg-[#030712] border border-white/10 rounded-lg text-white p-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none min-h-[150px]"
-                                        placeholder="Write your email body here. You can use HTML tags like <b>bold</b> or <br> for new lines."
-                                        required
+                                        onChange={val => setData('message', val)}
+                                        placeholder="Write your email body here..."
+                                        className="bg-white rounded-lg"
                                     />
                                     {errors.message && <p className="text-red-400 text-xs mt-1">{errors.message}</p>}
                                 </div>
@@ -170,15 +170,19 @@ export default function MailHub({ stats, logs }) {
                                     </tr>
                                 ) : (
                                     logs.data.map(log => (
-                                        <tr key={log.id} className="hover:bg-white/[0.02] transition-colors">
-                                            <td className="px-6 py-4 text-gray-400 whitespace-nowrap">
+                                        <tr 
+                                            key={log.id} 
+                                            onClick={() => router.visit(route('admin.mails.show', log.id))}
+                                            className="hover:bg-white/10 transition-colors cursor-pointer group"
+                                        >
+                                            <td className="px-6 py-4 text-gray-400 whitespace-nowrap group-hover:text-gray-200">
                                                 {new Date(log.created_at).toLocaleString()}
                                             </td>
-                                            <td className="px-6 py-4 font-medium text-white">
+                                            <td className="px-6 py-4 font-medium text-white group-hover:text-indigo-300">
                                                 {log.recipient}
                                             </td>
-                                            <td className="px-6 py-4 text-gray-300 truncate max-w-xs">
-                                                {log.subject}
+                                            <td className="px-6 py-4 text-gray-300 truncate max-w-xs group-hover:text-white">
+                                                {log.subject || '(No Subject)'}
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className={`px-2 py-1 rounded text-xs font-bold uppercase tracking-wider ${

@@ -32,6 +32,13 @@ class MailController extends Controller
         ]);
     }
 
+    public function show(EmailLog $email)
+    {
+        return Inertia::render('Admin/Mails/Show', [
+            'email' => $email,
+        ]);
+    }
+
     public function send(Request $request)
     {
         $request->validate([
@@ -39,13 +46,21 @@ class MailController extends Controller
             'subject' => 'required|string|max:255',
             'message' => 'required|string',
             'from_address' => 'nullable|email',
+            'parent_id' => 'nullable|exists:email_logs,id',
         ]);
 
         $fromAddress = $request->from_address ?: 'support@nexopay.com.bd';
+        $senderId = auth()->id();
 
         try {
             Mail::to($request->recipient)->send(
-                new CustomAdminMail($request->subject, $request->message, $fromAddress)
+                new CustomAdminMail(
+                    $request->subject, 
+                    $request->message, 
+                    $fromAddress,
+                    $senderId,
+                    $request->parent_id
+                )
             );
             
             return back()->with('success', 'Custom email queued successfully!');

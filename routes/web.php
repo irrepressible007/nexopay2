@@ -68,6 +68,7 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(
     
     Route::get('/mails', [\App\Http\Controllers\Admin\MailController::class, 'index'])->name('mails.index');
     Route::post('/mails/send', [\App\Http\Controllers\Admin\MailController::class, 'send'])->name('mails.send');
+    Route::get('/mails/{email}', [\App\Http\Controllers\Admin\MailController::class, 'show'])->name('mails.show');
 });
 
 Route::get('/p/{slug}', [\App\Http\Controllers\PublicPageController::class, 'show'])->name('page.show');

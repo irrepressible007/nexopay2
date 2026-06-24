@@ -36,9 +36,27 @@ class LogSentEmail
                 $type = 'custom';
             }
 
+            $senderId = null;
+            if ($message->getHeaders()->has('X-Sender-Id')) {
+                $senderId = $message->getHeaders()->get('X-Sender-Id')->getBodyAsString();
+            }
+
+            $parentId = null;
+            if ($message->getHeaders()->has('X-Parent-Id')) {
+                $parentId = $message->getHeaders()->get('X-Parent-Id')->getBodyAsString();
+            }
+
+            $htmlBody = $message->getHtmlBody();
+            if (!$htmlBody) {
+                $htmlBody = $message->getTextBody();
+            }
+
             EmailLog::create([
                 'recipient' => implode(', ', $recipients),
+                'sender_id' => $senderId,
+                'parent_id' => $parentId,
                 'subject' => $subject,
+                'body' => $htmlBody,
                 'status' => 'sent',
                 'type' => $type,
             ]);

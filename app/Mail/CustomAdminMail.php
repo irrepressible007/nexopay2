@@ -18,15 +18,19 @@ class CustomAdminMail extends Mailable
     public $subjectLine;
     public $messageBody;
     public $fromAddress;
+    public $senderId;
+    public $parentId;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($subjectLine, $messageBody, $fromAddress = 'support@nexopay.com.bd')
+    public function __construct($subjectLine, $messageBody, $fromAddress = 'support@nexopay.com.bd', $senderId = null, $parentId = null)
     {
         $this->subjectLine = $subjectLine;
         $this->messageBody = $messageBody;
         $this->fromAddress = $fromAddress;
+        $this->senderId = $senderId;
+        $this->parentId = $parentId;
     }
 
     /**
@@ -45,10 +49,20 @@ class CustomAdminMail extends Mailable
      */
     public function headers(): Headers
     {
+        $headers = [
+            'X-Mail-Type' => 'custom',
+        ];
+
+        if ($this->senderId) {
+            $headers['X-Sender-Id'] = (string) $this->senderId;
+        }
+
+        if ($this->parentId) {
+            $headers['X-Parent-Id'] = (string) $this->parentId;
+        }
+
         return new Headers(
-            text: [
-                'X-Mail-Type' => 'custom',
-            ],
+            text: $headers,
         );
     }
 
