@@ -4,23 +4,24 @@ import { useState } from 'react';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 
-export default function AnalyticsIndex({ auth, events, selectedEventId, stats, registrations = [], dynamicColumns = [] }) {
+export default function AnalyticsIndex({ auth, events, roles = [], selectedEventId, selectedRoleId, stats, registrations = [], dynamicColumns = [] }) {
     const [eventId, setEventId] = useState(selectedEventId || '');
+    const [roleId, setRoleId] = useState(selectedRoleId || '');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedParticipant, setSelectedParticipant] = useState(null);
 
-    const handleFilterChange = (e) => {
-        const value = e.target.value;
-        setEventId(value);
-        router.get(route('admin.analytics.index'), { event_id: value }, { preserveState: true, preserveScroll: true });
+    const handleFilterChange = (newEventId, newRoleId) => {
+        setEventId(newEventId);
+        setRoleId(newRoleId);
+        router.get(route('admin.analytics.index'), { event_id: newEventId, role_id: newRoleId }, { preserveState: true, preserveScroll: true });
     };
 
     const handleExportSummary = () => {
-        window.location.href = route('admin.analytics.export.summary', { event_id: eventId });
+        window.location.href = route('admin.analytics.export.summary', { event_id: eventId, role_id: roleId });
     };
 
     const handleExportDetailed = () => {
-        window.location.href = route('admin.analytics.export.detailed', { event_id: eventId });
+        window.location.href = route('admin.analytics.export.detailed', { event_id: eventId, role_id: roleId });
     };
 
     // Filter registrations by search term
@@ -63,18 +64,33 @@ export default function AnalyticsIndex({ auth, events, selectedEventId, stats, r
                     
                     {/* Header / Filter Area */}
                     <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div className="flex-1 w-full md:w-auto">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filter by Event</label>
-                            <select 
-                                value={eventId}
-                                onChange={handleFilterChange}
-                                className="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full md:w-64"
-                            >
-                                <option value="">Global (All Events)</option>
-                                {events.map(ev => (
-                                    <option key={ev.id} value={ev.id}>{ev.title}</option>
-                                ))}
-                            </select>
+                        <div className="flex-1 w-full md:w-auto flex flex-col sm:flex-row gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filter by Event</label>
+                                <select 
+                                    value={eventId}
+                                    onChange={(e) => handleFilterChange(e.target.value, roleId)}
+                                    className="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full sm:w-64"
+                                >
+                                    <option value="">Global (All Events)</option>
+                                    {events.map(ev => (
+                                        <option key={ev.id} value={ev.id}>{ev.title}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filter by Role</label>
+                                <select 
+                                    value={roleId}
+                                    onChange={(e) => handleFilterChange(eventId, e.target.value)}
+                                    className="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full sm:w-48 capitalize"
+                                >
+                                    <option value="">All Roles</option>
+                                    {roles.map(role => (
+                                        <option key={role.id} value={role.id}>{role.name}</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
                         <div className="flex gap-3 w-full md:w-auto justify-end">
                             <button 

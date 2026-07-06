@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Registration;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -15,8 +16,10 @@ class AnalyticsController extends Controller
     public function index(Request $request)
     {
         $eventId = $request->input('event_id');
+        $roleId = $request->input('role_id');
         
         $events = Event::select('id', 'title', 'status')->latest()->get();
+        $roles = Role::select('id', 'name')->get();
 
         $stats = [
             'total_revenue' => 0,
@@ -34,6 +37,10 @@ class AnalyticsController extends Controller
 
         if ($eventId) {
             $query->where('event_id', $eventId);
+        }
+        
+        if ($roleId) {
+            $query->where('role_id', $roleId);
         }
 
         $registrations = $query->get();
@@ -72,7 +79,9 @@ class AnalyticsController extends Controller
 
         return Inertia::render('Admin/Analytics/Index', [
             'events' => $events,
+            'roles' => $roles,
             'selectedEventId' => $eventId,
+            'selectedRoleId' => $roleId,
             'stats' => $stats,
             'registrations' => $registrations,
             'dynamicColumns' => $dynamicColumns
@@ -82,10 +91,14 @@ class AnalyticsController extends Controller
     public function exportSummary(Request $request)
     {
         $eventId = $request->input('event_id');
+        $roleId = $request->input('role_id');
         
         $query = Registration::query()->with(['role', 'event']);
         if ($eventId) {
             $query->where('event_id', $eventId);
+        }
+        if ($roleId) {
+            $query->where('role_id', $roleId);
         }
         $registrations = $query->get();
 
@@ -135,10 +148,14 @@ class AnalyticsController extends Controller
     public function exportDetailed(Request $request)
     {
         $eventId = $request->input('event_id');
+        $roleId = $request->input('role_id');
         
         $query = Registration::query()->with(['role', 'event', 'user']);
         if ($eventId) {
             $query->where('event_id', $eventId);
+        }
+        if ($roleId) {
+            $query->where('role_id', $roleId);
         }
         
         $registrations = $query->get();
