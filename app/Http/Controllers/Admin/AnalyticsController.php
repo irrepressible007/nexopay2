@@ -33,7 +33,7 @@ class AnalyticsController extends Controller
             'active_events' => Event::where('status', 'upcoming')->count(),
         ];
 
-        $query = Registration::query()->with('role');
+        $query = Registration::query()->with(['role', 'user', 'event']);
 
         if ($eventId) {
             $query->where('event_id', $eventId);

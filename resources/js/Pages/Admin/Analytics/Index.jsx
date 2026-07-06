@@ -4,6 +4,57 @@ import { useState } from 'react';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 
+const getSelectedSegmentsList = (selectedSegments, eventSegments) => {
+    if (!selectedSegments || !eventSegments || eventSegments.length === 0) return [];
+    
+    const list = [];
+    const optionsMap = selectedSegments.__options || {};
+
+    eventSegments.forEach(seg => {
+        const selection = selectedSegments[seg.id];
+        if (!selection) return;
+
+        if (seg.pricing_mode === 'global') {
+            list.push({
+                segmentName: seg.name,
+                selectionText: 'Selected',
+                price: seg.global_price || 0
+            });
+        } else {
+            const selectedSubIds = Array.isArray(selection) ? selection : [selection];
+            
+            selectedSubIds.forEach(subId => {
+                const sub = (seg.sub_segments || []).find(s => s.id == subId);
+                if (!sub) return;
+
+                if (!sub.has_options || sub.pricing_mode === 'global') {
+                    list.push({
+                        segmentName: seg.name,
+                        selectionText: sub.name,
+                        price: sub.price || 0
+                    });
+                } else {
+                    const subOptions = optionsMap[sub.id] || [];
+                    const selectedOptIds = Array.isArray(subOptions) ? subOptions : [subOptions];
+                    
+                    selectedOptIds.forEach(optId => {
+                        const opt = (sub.options || []).find(o => o.id == optId);
+                        if (!opt) return;
+                        
+                        list.push({
+                            segmentName: seg.name,
+                            selectionText: `${sub.name} - ${opt.name}`,
+                            price: opt.price || 0
+                        });
+                    });
+                }
+            });
+        }
+    });
+
+    return list;
+};
+
 export default function AnalyticsIndex({ auth, events, roles = [], selectedEventId, selectedRoleId, stats, registrations = [], dynamicColumns = [] }) {
     const [eventId, setEventId] = useState(selectedEventId || '');
     const [roleId, setRoleId] = useState(selectedRoleId || '');
@@ -370,6 +421,26 @@ export default function AnalyticsIndex({ auth, events, roles = [], selectedEvent
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Selected Segments */}
+                            {selectedParticipant.selected_segments && Object.keys(selectedParticipant.selected_segments).filter(k => k !== '__options').length > 0 && (
+                                <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Participating Segments</h3>
+                                    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700">
+                                        {getSelectedSegmentsList(selectedParticipant.selected_segments, selectedParticipant.event?.segments).map((item, idx) => (
+                                            <div key={idx} className="p-4 flex justify-between items-center">
+                                                <div>
+                                                    <div className="text-sm font-bold text-gray-800 dark:text-gray-200">{item.segmentName}</div>
+                                                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{item.selectionText}</div>
+                                                </div>
+                                                <div className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">
+                                                    ৳{item.price}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Dynamic Form Data */}
                             {selectedParticipant.form_data && Object.keys(selectedParticipant.form_data).length > 0 && (
