@@ -432,12 +432,12 @@ export default function Show({ auth, event }) {
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                                                         {activeSchema.map((field, index) => (
                                                             <div key={index} className={field.type === 'textarea' ? 'md:col-span-2' : ''}>
-                                                                <InputLabel value={field.label + (field.required ? ' *' : '')} className="text-gray-300" />
+                                                                <InputLabel value={field.label + ((field.required === true || field.required === 'true' || field.required === 1 || field.required === '1') ? ' *' : '')} className="text-gray-300" />
                                                                 {field.type === 'textarea' ? (
                                                                     <textarea
                                                                         value={data.form_data[field.name] || ''}
                                                                         onChange={e => setData('form_data', { ...data.form_data, [field.name]: e.target.value })}
-                                                                        required={field.required}
+                                                                        required={field.required === true || field.required === 'true' || field.required === 1 || field.required === '1'}
                                                                         className="mt-2 block w-full bg-black/50 border-gray-700 text-white focus:border-indigo-500 rounded-xl shadow-sm transition"
                                                                         rows="3"
                                                                     />
@@ -445,7 +445,7 @@ export default function Show({ auth, event }) {
                                                                     <select
                                                                         value={data.form_data[field.name] || ''}
                                                                         onChange={e => setData('form_data', { ...data.form_data, [field.name]: e.target.value })}
-                                                                        required={field.required}
+                                                                        required={field.required === true || field.required === 'true' || field.required === 1 || field.required === '1'}
                                                                         className="mt-2 block w-full bg-black/50 border-gray-700 text-white focus:border-indigo-500 rounded-xl shadow-sm transition [&>option]:bg-gray-900"
                                                                     >
                                                                         <option value="" disabled>Select an option...</option>
@@ -458,7 +458,7 @@ export default function Show({ auth, event }) {
                                                                         type={field.type}
                                                                         value={data.form_data[field.name] || ''}
                                                                         onChange={e => setData('form_data', { ...data.form_data, [field.name]: e.target.value })}
-                                                                        required={field.required}
+                                                                        required={field.required === true || field.required === 'true' || field.required === 1 || field.required === '1'}
                                                                         className="mt-2 block w-full bg-black/50 border-gray-700 text-white rounded-xl transition"
                                                                     />
                                                                 )}

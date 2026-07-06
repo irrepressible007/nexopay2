@@ -45,9 +45,9 @@ class EventController extends Controller
         ]);
 
         $validated['segments'] = $request->input('segments', []);
-        $validated['form_schema'] = $request->input('form_schema', []);
-        $validated['ca_form_schema'] = $request->input('ca_form_schema', []);
-        $validated['volunteer_form_schema'] = $request->input('volunteer_form_schema', []);
+        $validated['form_schema'] = $this->castSchemaBooleans($request->input('form_schema', []));
+        $validated['ca_form_schema'] = $this->castSchemaBooleans($request->input('ca_form_schema', []));
+        $validated['volunteer_form_schema'] = $this->castSchemaBooleans($request->input('volunteer_form_schema', []));
 
         if ($request->hasFile('gallery_images')) {
             $images = [];
@@ -123,9 +123,9 @@ class EventController extends Controller
         ]);
 
         $validated['segments'] = $request->input('segments', []);
-        $validated['form_schema'] = $request->input('form_schema', []);
-        $validated['ca_form_schema'] = $request->input('ca_form_schema', []);
-        $validated['volunteer_form_schema'] = $request->input('volunteer_form_schema', []);
+        $validated['form_schema'] = $this->castSchemaBooleans($request->input('form_schema', []));
+        $validated['ca_form_schema'] = $this->castSchemaBooleans($request->input('ca_form_schema', []));
+        $validated['volunteer_form_schema'] = $this->castSchemaBooleans($request->input('volunteer_form_schema', []));
 
         if ($request->hasFile('gallery_images')) {
             $images = [];
@@ -172,5 +172,15 @@ class EventController extends Controller
     {
         $event->delete();
         return redirect()->route('admin.events.index')->with('success', 'Event deleted successfully.');
+    }
+
+    private function castSchemaBooleans(array $schema): array
+    {
+        foreach ($schema as &$field) {
+            if (isset($field['required'])) {
+                $field['required'] = filter_var($field['required'], FILTER_VALIDATE_BOOLEAN);
+            }
+        }
+        return $schema;
     }
 }
