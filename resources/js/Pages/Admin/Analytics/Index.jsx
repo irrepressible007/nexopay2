@@ -303,7 +303,7 @@ export default function AnalyticsIndex({ auth, events, roles = [], selectedEvent
 
             {/* Participant Details Modal */}
             <Modal show={selectedParticipant !== null} onClose={() => setSelectedParticipant(null)} maxWidth="2xl">
-                <div className="p-6 bg-white dark:bg-gray-900 w-full h-full">
+                <div className="p-6 bg-white dark:bg-gray-900 w-full max-h-[85vh] overflow-y-auto">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
                             Participant Details
