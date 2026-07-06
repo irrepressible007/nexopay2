@@ -70,6 +70,9 @@ export default function AnalyticsIndex({ auth, events, roles = [], selectedEvent
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedParticipant, setSelectedParticipant] = useState(null);
 
+    const selectedRole = roles.find(r => r.id == roleId);
+    const isParticipantFiltered = selectedRole && selectedRole.name.toLowerCase() === 'participant';
+
     const handleFilterChange = (newEventId, newRoleId) => {
         setEventId(newEventId);
         setRoleId(newRoleId);
@@ -292,6 +295,11 @@ export default function AnalyticsIndex({ auth, events, roles = [], selectedEvent
                                         <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Status</th>
                                         <th scope="col" className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">TxID / Sender</th>
                                         <th scope="col" className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Amount</th>
+                                        {isParticipantFiltered && (
+                                            <th scope="col" className="px-4 py-3 text-left font-semibold text-teal-700 dark:text-teal-400 border-l border-gray-200 dark:border-gray-700">
+                                                Participating Segments
+                                            </th>
+                                        )}
                                         
                                         {/* Render Dynamic Columns */}
                                         {dynamicColumns && dynamicColumns.map(col => (
@@ -334,6 +342,17 @@ export default function AnalyticsIndex({ auth, events, roles = [], selectedEvent
                                                 <td className="px-4 py-3 text-gray-600 dark:text-gray-400 font-semibold">
                                                     ৳{reg.payable_amount}
                                                 </td>
+                                                {isParticipantFiltered && (
+                                                    <td className="px-4 py-3 text-gray-600 dark:text-gray-400 border-l border-gray-100 dark:border-gray-800 max-w-[250px] truncate" title={
+                                                        getSelectedSegmentsList(reg.selected_segments, reg.event?.segments)
+                                                            .map(item => `${item.segmentName} (${item.selectionText})`)
+                                                            .join(', ')
+                                                    }>
+                                                        {getSelectedSegmentsList(reg.selected_segments, reg.event?.segments)
+                                                            .map(item => `${item.segmentName} (${item.selectionText})`)
+                                                            .join(', ') || '-'}
+                                                    </td>
+                                                )}
                                                 
                                                 {/* Render Dynamic Column Values */}
                                                 {dynamicColumns && dynamicColumns.map(col => {
