@@ -7,7 +7,29 @@ import SecondaryButton from '@/Components/SecondaryButton';
 
 export default function Index({ auth, registrations }) {
     const [selectedParticipant, setSelectedParticipant] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
     const { post, delete: destroy, processing } = useForm();
+
+    const filteredRegistrations = registrations.filter(reg => {
+        if (!searchTerm) return true;
+        const term = searchTerm.toLowerCase();
+        const userName = (reg.user ? reg.user.name : reg.guest_name) || '';
+        const userEmail = (reg.user ? reg.user.email : reg.guest_email) || '';
+        const txid = reg.bkash_txid || '';
+        const sender = reg.sender_number || '';
+        const amount = String(reg.payable_amount || '');
+        const eventTitle = reg.event ? reg.event.title : '';
+        const roleName = reg.role ? reg.role.name : '';
+        
+        return userName.toLowerCase().includes(term) ||
+               userEmail.toLowerCase().includes(term) ||
+               txid.toLowerCase().includes(term) ||
+               sender.toLowerCase().includes(term) ||
+               amount.toLowerCase().includes(term) ||
+               eventTitle.toLowerCase().includes(term) ||
+               roleName.toLowerCase().includes(term) ||
+               reg.status.toLowerCase().includes(term);
+    });
 
     const handleApprove = (id) => {
         if (confirm('Are you sure you want to approve this registration? It will send a Premium Ticket email.')) {
@@ -53,11 +75,22 @@ export default function Index({ auth, registrations }) {
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700">
-                            <h3 className="text-lg font-bold mb-2">Pending Manual Verification Queue</h3>
-                            <p className="text-sm text-gray-500 mb-4">
-                                Review the submitted bKash Transaction IDs against your merchant app and approve/reject registrations.
-                            </p>
+                        <div className="p-6 text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div>
+                                <h3 className="text-lg font-bold mb-2">Pending Manual Verification Queue</h3>
+                                <p className="text-sm text-gray-500">
+                                    Review the submitted bKash Transaction IDs against your merchant app and approve/reject registrations.
+                                </p>
+                            </div>
+                            <div className="w-full md:w-auto">
+                                <input
+                                    type="text"
+                                    placeholder="Search registrations..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full md:w-64"
+                                />
+                            </div>
                         </div>
                         
                         <div className="overflow-x-auto">
@@ -73,14 +106,14 @@ export default function Index({ auth, registrations }) {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                    {registrations.data.length === 0 ? (
+                                    {filteredRegistrations.length === 0 ? (
                                         <tr>
-                                            <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
+                                            <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
                                                 No registrations in the queue.
                                             </td>
                                         </tr>
                                     ) : (
-                                        registrations.data.map((reg) => (
+                                        filteredRegistrations.map((reg) => (
                                             <tr 
                                                 key={reg.id} 
                                                 onClick={() => setSelectedParticipant(reg)}
@@ -184,7 +217,7 @@ export default function Index({ auth, registrations }) {
                         
                         {/* Pagination placeholder (simple text for now) */}
                         <div className="p-4 border-t border-gray-200 dark:border-gray-700 text-gray-500 text-sm">
-                            Showing {registrations.data.length} items
+                            Showing {filteredRegistrations.length} of {registrations.length} items
                         </div>
                     </div>
                 </div>

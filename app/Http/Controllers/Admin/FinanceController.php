@@ -18,7 +18,7 @@ class FinanceController extends Controller
         $registrations = Registration::with(['user', 'event', 'role'])
             ->orderByRaw("FIELD(status, 'pending') DESC")
             ->orderBy('created_at', 'desc')
-            ->paginate(15);
+            ->get();
 
         return Inertia::render('Admin/Finance/Index', [
             'registrations' => $registrations
