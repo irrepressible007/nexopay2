@@ -92,11 +92,17 @@ export default function MailShow({ email }) {
                     </div>
 
                     {/* Email Body */}
-                    <div className="p-8 text-gray-200 prose prose-invert max-w-none bg-black/20 rounded-b-2xl">
+                    <div className="bg-white rounded-b-2xl overflow-hidden flex flex-col">
                         {email.body ? (
-                            <div dangerouslySetInnerHTML={{ __html: email.body }} />
+                            <iframe 
+                                srcDoc={email.body} 
+                                className="w-full min-h-[600px] border-0"
+                                title="Email Body"
+                            />
                         ) : (
-                            <p className="text-gray-500 italic">No message body was recorded for this email. (Emails sent before the Inbox feature update will not have a saved body).</p>
+                            <div className="p-8 text-gray-500 italic bg-[#0f172a]">
+                                No message body was recorded for this email. (Emails sent before the Inbox feature update will not have a saved body).
+                            </div>
                         )}
                     </div>
                 </div>
