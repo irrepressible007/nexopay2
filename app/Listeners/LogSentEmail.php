@@ -47,8 +47,14 @@ class LogSentEmail
             }
 
             $htmlBody = $message->getHtmlBody();
+            if (is_resource($htmlBody)) {
+                $htmlBody = stream_get_contents($htmlBody);
+            }
             if (!$htmlBody) {
                 $htmlBody = $message->getTextBody();
+                if (is_resource($htmlBody)) {
+                    $htmlBody = stream_get_contents($htmlBody);
+                }
             }
 
             EmailLog::create([

@@ -208,6 +208,31 @@ export default function MailHub({ stats, logs }) {
                             </tbody>
                         </table>
                     </div>
+                    {/* Pagination */}
+                    {logs.links && logs.links.length > 3 && (
+                        <div className="bg-white/5 border-t border-white/10 px-6 py-4 flex flex-wrap justify-center gap-2">
+                            {logs.links.map((link, i) => (
+                                link.url ? (
+                                    <button
+                                        key={i}
+                                        onClick={() => router.visit(link.url)}
+                                        dangerouslySetInnerHTML={{ __html: link.label }}
+                                        className={`px-4 py-2 text-sm rounded transition ${
+                                            link.active 
+                                                ? 'bg-indigo-600 text-white font-bold' 
+                                                : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                        }`}
+                                    />
+                                ) : (
+                                    <span 
+                                        key={i} 
+                                        dangerouslySetInnerHTML={{ __html: link.label }}
+                                        className="px-4 py-2 text-sm rounded bg-white/5 text-gray-500 cursor-not-allowed"
+                                    />
+                                )
+                            ))}
+                        </div>
+                    )}
                 </div>
 
             </div>
