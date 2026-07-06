@@ -7,16 +7,25 @@ import SecondaryButton from '@/Components/SecondaryButton';
 const getSelectedSegmentsList = (selectedSegments, eventSegments) => {
     if (!selectedSegments || !eventSegments || eventSegments.length === 0) return [];
     
+    let parsedSegments = selectedSegments;
+    if (typeof selectedSegments === 'string') {
+        try {
+            parsedSegments = JSON.parse(selectedSegments);
+        } catch (e) {
+            return [];
+        }
+    }
+
     const list = [];
-    const optionsMap = selectedSegments.__options || {};
+    const optionsMap = parsedSegments.__options || {};
 
     eventSegments.forEach(seg => {
-        const selection = selectedSegments[seg.id];
+        const selection = parsedSegments[seg.id];
         if (!selection) return;
 
         if (seg.pricing_mode === 'global') {
             list.push({
-                segmentName: seg.name,
+                segmentName: seg.title,
                 selectionText: 'Selected',
                 price: seg.global_price || 0
             });
@@ -29,8 +38,8 @@ const getSelectedSegmentsList = (selectedSegments, eventSegments) => {
 
                 if (!sub.has_options || sub.pricing_mode === 'global') {
                     list.push({
-                        segmentName: seg.name,
-                        selectionText: sub.name,
+                        segmentName: seg.title,
+                        selectionText: sub.title,
                         price: sub.price || 0
                     });
                 } else {
@@ -42,8 +51,8 @@ const getSelectedSegmentsList = (selectedSegments, eventSegments) => {
                         if (!opt) return;
                         
                         list.push({
-                            segmentName: seg.name,
-                            selectionText: `${sub.name} - ${opt.name}`,
+                            segmentName: seg.title,
+                            selectionText: `${sub.title} - ${opt.title}`,
                             price: opt.price || 0
                         });
                     });
