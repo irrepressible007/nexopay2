@@ -101,6 +101,7 @@ export default function Show({ auth, event }) {
         event_id: event.id,
         role: selectedRole,
         bkash_txid: '',
+        sender_number: '',
         form_data: initialFormData,
         selected_segments: selectedSegments,
         selected_options: {},
@@ -610,6 +611,19 @@ export default function Show({ auth, event }) {
                                                     </div>
                                                 </div>
                                                 
+                                                <div className="mb-6">
+                                                    <InputLabel value="bKash Sender Number *" className="text-gray-300 mb-2" />
+                                                    <TextInput
+                                                        name="sender_number"
+                                                        value={data.sender_number}
+                                                        onChange={e => setData('sender_number', e.target.value)}
+                                                        required
+                                                        className="mt-1 block w-full text-xl p-4 font-mono tracking-widest bg-black/50 border-gray-700 text-white rounded-xl text-center focus:border-indigo-500 placeholder-gray-700"
+                                                        placeholder="017XXXXXXXX"
+                                                    />
+                                                    <InputError message={errors.sender_number} className="mt-2 text-center" />
+                                                </div>
+
                                                 <div className="mb-10">
                                                     <InputLabel value="bKash Transaction ID *" className="text-gray-300 mb-2" />
                                                     <TextInput

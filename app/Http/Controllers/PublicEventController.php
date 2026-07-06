@@ -129,8 +129,10 @@ class PublicEventController extends Controller
         // Require bkash_txid only if total amount to pay is greater than 0
         if ($total > 0) {
             $rules['bkash_txid'] = 'required|string|unique:registrations,bkash_txid';
+            $rules['sender_number'] = 'required|string|max:20';
         } else {
             $rules['bkash_txid'] = 'nullable|string';
+            $rules['sender_number'] = 'nullable|string';
         }
 
         if (!$event->require_login && !auth()->check()) {
@@ -164,6 +166,7 @@ class PublicEventController extends Controller
             'event_id' => $event->id,
             'role_id' => $role->id,
             'bkash_txid' => $request->bkash_txid,
+            'sender_number' => $request->sender_number,
             'status' => 'pending', // You could auto-approve free ones, but let's leave it pending for now
             'form_data' => $request->form_data,
             'selected_segments' => $selectedSegments,

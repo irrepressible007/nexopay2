@@ -17,6 +17,7 @@ class Registration extends Model
         'event_id',
         'role_id',
         'bkash_txid',
+        'sender_number',
         'status',
         'form_data',
         'selected_segments',

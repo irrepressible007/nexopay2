@@ -230,8 +230,8 @@ export default function AnalyticsIndex({ auth, events, roles = [], selectedEvent
                                         <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Email</th>
                                         <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Role</th>
                                         <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Status</th>
-                                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">TxID</th>
-                                        <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Amount</th>
+                                        <th scope="col" className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">TxID / Sender</th>
+                                        <th scope="col" className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Amount</th>
                                         
                                         {/* Render Dynamic Columns */}
                                         {dynamicColumns && dynamicColumns.map(col => (
@@ -268,7 +268,8 @@ export default function AnalyticsIndex({ auth, events, roles = [], selectedEvent
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-3 text-gray-600 dark:text-gray-400 font-mono text-xs">
-                                                    {reg.bkash_txid || '-'}
+                                                    <div>{reg.bkash_txid || '-'}</div>
+                                                    <div className="text-gray-500 dark:text-gray-500 text-[10px] mt-0.5">{reg.sender_number || ''}</div>
                                                 </td>
                                                 <td className="px-4 py-3 text-gray-600 dark:text-gray-400 font-semibold">
                                                     ৳{reg.payable_amount}
@@ -354,6 +355,12 @@ export default function AnalyticsIndex({ auth, events, roles = [], selectedEvent
                                     <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Transaction ID</div>
                                     <div className="text-base text-gray-900 dark:text-gray-100 font-mono">
                                         {selectedParticipant.bkash_txid || 'N/A'}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Sender Number</div>
+                                    <div className="text-base text-gray-900 dark:text-gray-100 font-mono">
+                                        {selectedParticipant.sender_number || 'N/A'}
                                     </div>
                                 </div>
                                 <div>

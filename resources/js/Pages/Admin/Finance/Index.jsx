@@ -66,7 +66,8 @@ export default function Index({ auth, registrations }) {
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event & Role</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TxID</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TxID / Sender</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                     </tr>
@@ -93,8 +94,12 @@ export default function Index({ auth, registrations }) {
                                                     <div className="text-sm font-bold text-gray-900 dark:text-white">{reg.event?.title || 'Unknown Event'}</div>
                                                     <div className="text-sm text-gray-500">{reg.role?.name || 'Participant'}</div>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap font-mono text-sm uppercase">
-                                                    {reg.bkash_txid}
+                                                <td className="px-6 py-4 whitespace-nowrap font-bold text-sm text-indigo-600 dark:text-indigo-400">
+                                                    ৳{reg.payable_amount}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="font-mono text-sm uppercase text-gray-900 dark:text-white">{reg.bkash_txid || '-'}</div>
+                                                    <div className="text-xs text-gray-500">{reg.sender_number || ''}</div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
@@ -238,6 +243,12 @@ export default function Index({ auth, registrations }) {
                                     <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Transaction ID</div>
                                     <div className="text-base text-gray-900 dark:text-gray-100 font-mono">
                                         {selectedParticipant.bkash_txid || 'N/A'}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Sender Number</div>
+                                    <div className="text-base text-gray-900 dark:text-gray-100 font-mono">
+                                        {selectedParticipant.sender_number || 'N/A'}
                                     </div>
                                 </div>
                                 <div>
