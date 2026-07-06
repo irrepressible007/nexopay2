@@ -20,7 +20,7 @@ class MailController extends Controller
                                ->count();
         $lifetimeCount = EmailLog::count();
         
-        $logs = EmailLog::orderBy('created_at', 'desc')->paginate(20);
+        $logs = EmailLog::orderBy('created_at', 'desc')->get();
 
         return Inertia::render('Admin/Mails/Index', [
             'stats' => [
