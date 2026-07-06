@@ -182,7 +182,7 @@ class AnalyticsController extends Controller
         $callback = function() use ($registrations, $dynamicColumns) {
             $file = fopen('php://output', 'w');
 
-            $cols = ['ID', 'Event', 'User Name', 'User Email', 'Role', 'Status', 'Payable Amount', 'bKash TXID', 'Registered At'];
+            $cols = ['ID', 'Event', 'User Name', 'User Email', 'Role', 'Status', 'Payable Amount', 'bKash TXID', 'bKash Sender Number', 'Registered At'];
             // Add dynamic columns
             $cols = array_merge($cols, $dynamicColumns);
             // Add Selected Segments Column
@@ -203,6 +203,7 @@ class AnalyticsController extends Controller
                     $reg->status,
                     $reg->payable_amount,
                     $reg->bkash_txid,
+                    $reg->sender_number,
                     $reg->created_at->toDateTimeString(),
                 ];
 

@@ -127,7 +127,7 @@ class FinanceController extends Controller
             
             // CSV Header
             fputcsv($file, [
-                'ID', 'User Name', 'Email', 'Event', 'Role', 'TxID', 'Status', 'Date'
+                'ID', 'User Name', 'Email', 'Event', 'Role', 'Amount', 'TxID', 'Sender Number', 'Status', 'Date'
             ]);
 
             foreach ($registrations as $reg) {
@@ -137,7 +137,9 @@ class FinanceController extends Controller
                     $reg->user ? $reg->user->email : $reg->guest_email,
                     $reg->event->title,
                     $reg->role->name,
+                    $reg->payable_amount,
                     $reg->bkash_txid,
+                    $reg->sender_number,
                     $reg->status,
                     $reg->created_at->format('Y-m-d H:i:s')
                 ]);

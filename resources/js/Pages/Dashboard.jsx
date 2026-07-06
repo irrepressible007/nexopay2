@@ -60,7 +60,12 @@ export default function Dashboard({ auth, registrations }) {
                                             <span className="text-sm font-semibold text-indigo-400">{reg.role.name}</span>
                                         </div>
                                         <h4 className="text-xl font-bold mb-2 text-white line-clamp-2">{reg.event.title}</h4>
-                                        <p className="text-sm text-gray-400 mb-2">TxID: <span className="font-mono uppercase text-indigo-300">{reg.bkash_txid}</span></p>
+                                        <p className="text-sm text-gray-400 mb-2">
+                                            TxID: <span className="font-mono uppercase text-indigo-300 mr-4">{reg.bkash_txid}</span>
+                                            {reg.sender_number && (
+                                                <span>Sent From: <span className="font-mono text-indigo-300">{reg.sender_number}</span></span>
+                                            )}
+                                        </p>
                                     </div>
                                     
                                     <div className="p-6 bg-white/5 backdrop-blur-sm flex-1 flex flex-col gap-4">
