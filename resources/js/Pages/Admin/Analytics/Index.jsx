@@ -78,19 +78,7 @@ export default function AnalyticsIndex({ auth, events, roles = [], selectedEvent
                                     ))}
                                 </select>
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filter by Role</label>
-                                <select 
-                                    value={roleId}
-                                    onChange={(e) => handleFilterChange(eventId, e.target.value)}
-                                    className="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full sm:w-48 capitalize"
-                                >
-                                    <option value="">All Roles</option>
-                                    {roles.map(role => (
-                                        <option key={role.id} value={role.id}>{role.name}</option>
-                                    ))}
-                                </select>
-                            </div>
+
                         </div>
                         <div className="flex gap-3 w-full md:w-auto justify-end">
                             <button 
@@ -214,13 +202,25 @@ export default function AnalyticsIndex({ auth, events, roles = [], selectedEvent
                                 <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">Detailed Registrations</h3>
                                 <p className="text-sm text-gray-500 mt-1">Scroll horizontally to view custom form fields. Use the search to filter all columns.</p>
                             </div>
-                            <input
-                                type="text"
-                                placeholder="Search any field..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-64"
-                            />
+                            <div className="flex flex-col sm:flex-row gap-3 items-center">
+                                <select 
+                                    value={roleId}
+                                    onChange={(e) => handleFilterChange(eventId, e.target.value)}
+                                    className="border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full sm:w-48 capitalize"
+                                >
+                                    <option value="">All Roles</option>
+                                    {roles.map(role => (
+                                        <option key={role.id} value={role.id}>{role.name}</option>
+                                    ))}
+                                </select>
+                                <input
+                                    type="text"
+                                    placeholder="Search any field..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full sm:w-64"
+                                />
+                            </div>
                         </div>
                         <div className="overflow-x-auto p-0">
                             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm whitespace-nowrap">
