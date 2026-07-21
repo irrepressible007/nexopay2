@@ -15,6 +15,33 @@ export default function Show({ auth, event }) {
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
     const isFuture = event.start_date && new Date(event.start_date) > new Date();
 
+    const [showFloatingBtn, setShowFloatingBtn] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const registerSection = document.getElementById('register');
+            if (!registerSection) return;
+
+            const rect = registerSection.getBoundingClientRect();
+            const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
+            const isPastThreshold = window.scrollY > 400;
+
+            setShowFloatingBtn(isPastThreshold && !isVisible);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        handleScroll();
+
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const scrollToRegister = () => {
+        const registerSection = document.getElementById('register');
+        if (registerSection) {
+            registerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
+
     useEffect(() => {
         if (!isFuture) return;
         const targetDate = new Date(event.start_date).getTime();
@@ -720,6 +747,27 @@ export default function Show({ auth, event }) {
                     </section>
                 )}
             </div>
+
+            <AnimatePresence>
+                {showFloatingBtn && (
+                    <motion.button
+                        key="floating-reg"
+                        initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 50, scale: 0.9 }}
+                        transition={{ type: "spring", stiffness: 260, damping: 25 }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={scrollToRegister}
+                        className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold px-6 py-3.5 rounded-full shadow-[0_0_20px_rgba(99,102,241,0.5)] hover:shadow-[0_0_30px_rgba(99,102,241,0.8)] border border-white/20 flex items-center gap-2 group transition-all duration-300"
+                    >
+                        <span>📝 Register Now</span>
+                        <svg className="w-5 h-5 transform group-hover:translate-y-[2px] transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 13l-7 7-7-7m14-6l-7 7-7-7" />
+                        </svg>
+                    </motion.button>
+                )}
+            </AnimatePresence>
         </>
     );
 }
