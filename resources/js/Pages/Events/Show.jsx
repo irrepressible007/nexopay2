@@ -223,14 +223,6 @@ export default function Show({ auth, event }) {
             return;
         }
 
-        if (typeof window !== 'undefined' && window.fbq) {
-            window.fbq('track', 'InitiateCheckout', {
-                content_name: event.title,
-                value: totalPrice || 0,
-                currency: 'BDT'
-            });
-        }
-
         if (targetStep === 2) {
             if (selectedRole !== 'Participant' || segments.length === 0) {
                 if (totalPrice === 0) {

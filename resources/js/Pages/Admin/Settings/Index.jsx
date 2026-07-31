@@ -130,7 +130,7 @@ export default function SettingsIndex({ auth, siteSettings = {} }) {
                                         onChange={(e) => setData('meta_pixel_id', e.target.value)}
                                     />
                                     <p className="text-xs text-gray-400 mt-2">
-                                        Enter your 15-16 digit Meta Pixel ID from Events Manager. Standard <code className="text-indigo-400">PageView</code>, <code className="text-indigo-400">InitiateCheckout</code>, <code className="text-indigo-400">Lead</code>, and <code className="text-indigo-400">CompleteRegistration</code> events will automatically be tracked.
+                                        Enter your 15-16 digit Meta Pixel ID from Events Manager. Standard <code className="text-indigo-400">PageView</code> and <code className="text-indigo-400">CompleteRegistration</code> events will automatically be tracked.
                                     </p>
                                     <InputError message={errors.meta_pixel_id} className="mt-2" />
                                 </div>
