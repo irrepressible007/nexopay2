@@ -30,6 +30,9 @@ class Event extends Model
         'has_base_price',
         'require_login',
         'payment_instructions',
+        'allow_participant_registration',
+        'allow_ca_registration',
+        'allow_volunteer_registration',
     ];
 
     protected function casts(): array
@@ -44,6 +47,9 @@ class Event extends Model
             'gallery_images' => 'array',
             'has_base_price' => 'boolean',
             'require_login' => 'boolean',
+            'allow_participant_registration' => 'boolean',
+            'allow_ca_registration' => 'boolean',
+            'allow_volunteer_registration' => 'boolean',
         ];
     }
 

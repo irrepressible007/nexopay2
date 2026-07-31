@@ -30,6 +30,9 @@ export default function Edit({ auth, event }) {
         has_base_price: event.has_base_price ?? false,
         require_login: event.require_login !== undefined ? event.require_login : true,
         payment_instructions: event.payment_instructions || '',
+        allow_participant_registration: event.allow_participant_registration !== undefined ? Boolean(event.allow_participant_registration) : true,
+        allow_ca_registration: event.allow_ca_registration !== undefined ? Boolean(event.allow_ca_registration) : true,
+        allow_volunteer_registration: event.allow_volunteer_registration !== undefined ? Boolean(event.allow_volunteer_registration) : true,
     });
 
     const [activeFormTab, setActiveFormTab] = useState('participant');
@@ -238,6 +241,58 @@ export default function Edit({ auth, event }) {
                                     placeholder="e.g. Send money to 01XXX-XXXXXX (bKash Personal) and enter the Transaction ID below..."
                                 />
                                 <InputError message={errors.payment_instructions} className="mt-2" />
+                            </div>
+
+                            <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
+                                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Form Availability / Response Toggles</h3>
+                                <p className="text-sm text-gray-500 mb-4">Turn registration responses ON or OFF independently for each role/form without affecting each other.</p>
+
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <label className={`flex items-center justify-between p-4 rounded-xl border transition cursor-pointer ${data.allow_participant_registration ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-900/20' : 'border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'}`}>
+                                        <div>
+                                            <span className="font-semibold text-gray-900 dark:text-gray-100 text-sm block">Participant Form</span>
+                                            <span className={`text-xs font-bold ${data.allow_participant_registration ? 'text-green-600 dark:text-green-400' : 'text-red-500'}`}>
+                                                {data.allow_participant_registration ? '● Accepting Responses' : '○ Closed (Off)'}
+                                            </span>
+                                        </div>
+                                        <input
+                                            type="checkbox"
+                                            checked={data.allow_participant_registration}
+                                            onChange={(e) => setData('allow_participant_registration', e.target.checked)}
+                                            className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 h-5 w-5"
+                                        />
+                                    </label>
+
+                                    <label className={`flex items-center justify-between p-4 rounded-xl border transition cursor-pointer ${data.allow_ca_registration ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-900/20' : 'border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'}`}>
+                                        <div>
+                                            <span className="font-semibold text-gray-900 dark:text-gray-100 text-sm block">CA Form</span>
+                                            <span className={`text-xs font-bold ${data.allow_ca_registration ? 'text-green-600 dark:text-green-400' : 'text-red-500'}`}>
+                                                {data.allow_ca_registration ? '● Accepting Responses' : '○ Closed (Off)'}
+                                            </span>
+                                        </div>
+                                        <input
+                                            type="checkbox"
+                                            checked={data.allow_ca_registration}
+                                            onChange={(e) => setData('allow_ca_registration', e.target.checked)}
+                                            className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 h-5 w-5"
+                                        />
+                                    </label>
+
+                                    <label className={`flex items-center justify-between p-4 rounded-xl border transition cursor-pointer ${data.allow_volunteer_registration ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-900/20' : 'border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'}`}>
+                                        <div>
+                                            <span className="font-semibold text-gray-900 dark:text-gray-100 text-sm block">Volunteer Form</span>
+                                            <span className={`text-xs font-bold ${data.allow_volunteer_registration ? 'text-green-600 dark:text-green-400' : 'text-red-500'}`}>
+                                                {data.allow_volunteer_registration ? '● Accepting Responses' : '○ Closed (Off)'}
+                                            </span>
+                                        </div>
+                                        <input
+                                            type="checkbox"
+                                            checked={data.allow_volunteer_registration}
+                                            onChange={(e) => setData('allow_volunteer_registration', e.target.checked)}
+                                            className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 h-5 w-5"
+                                        />
+                                    </label>
+                                </div>
                             </div>
 
                             <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">

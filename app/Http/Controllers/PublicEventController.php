@@ -59,6 +59,17 @@ class PublicEventController extends Controller
             return redirect()->route('login')->with('error', 'You must be logged in to register for this event.');
         }
 
+        // --- Check Role Registration Toggles ---
+        if ($request->role === 'Participant' && $event->allow_participant_registration === false) {
+            return redirect()->back()->with('error', 'Participant registration for this event is currently closed.');
+        }
+        if ($request->role === 'Campus Ambassador' && $event->allow_ca_registration === false) {
+            return redirect()->back()->with('error', 'Campus Ambassador registration for this event is currently closed.');
+        }
+        if ($request->role === 'Volunteer' && $event->allow_volunteer_registration === false) {
+            return redirect()->back()->with('error', 'Volunteer registration for this event is currently closed.');
+        }
+
         // --- Calculate Total Price First ---
         $total = 0;
         

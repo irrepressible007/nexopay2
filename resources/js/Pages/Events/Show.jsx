@@ -61,9 +61,15 @@ export default function Show({ auth, event }) {
         return () => clearInterval(interval);
     }, [event.start_date, isFuture]);
 
+    // Available Roles & Registration Toggles
+    const availableRoles = [];
+    if (event.allow_participant_registration !== false) availableRoles.push('Participant');
+    if (event.allow_ca_registration !== false) availableRoles.push('Campus Ambassador');
+    if (event.allow_volunteer_registration !== false) availableRoles.push('Volunteer');
+
     // Registration State
     const [step, setStep] = useState(1);
-    const [selectedRole, setSelectedRole] = useState('Participant');
+    const [selectedRole, setSelectedRole] = useState(availableRoles.includes('Participant') ? 'Participant' : (availableRoles[0] || 'Participant'));
     const [prices] = useState({
         Participant: event.participant_price,
         'Campus Ambassador': event.ca_price,
@@ -372,7 +378,15 @@ export default function Show({ auth, event }) {
                             <h2 className="text-3xl font-black text-white mb-2">Secure Your Spot</h2>
                             <p className="text-gray-400 mb-8">Complete the steps below to register for {event.title}.</p>
 
-                            {!canRegister ? (
+                            {availableRoles.length === 0 ? (
+                                <div className="text-center py-12 bg-white/5 rounded-3xl border border-white/10">
+                                    <div className="w-16 h-16 bg-red-500/20 text-red-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/30">
+                                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-white mb-2">Registrations Closed</h3>
+                                    <p className="text-gray-400 max-w-md mx-auto">Responses for all forms in this event are currently turned off by the organizers.</p>
+                                </div>
+                            ) : !canRegister ? (
                                 <div className="text-center py-12 bg-white/5 rounded-3xl border border-white/10">
                                     <div className="w-16 h-16 bg-indigo-500/20 text-indigo-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-indigo-500/30">
                                         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
@@ -446,7 +460,7 @@ export default function Show({ auth, event }) {
                                                 <div className="mb-8">
                                                     <InputLabel value="Select your Role *" className="text-gray-300 mb-3" />
                                                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                                        {Object.keys(prices).map(role => (
+                                                        {availableRoles.map(role => (
                                                             <button
                                                                 type="button"
                                                                 key={role}
