@@ -32,6 +32,7 @@ class SettingsController extends Controller
             'contact_phone' => 'nullable|string',
             'contact_email' => 'nullable|string',
             'primary_color' => 'nullable|string',
+            'meta_pixel_id' => 'nullable|string',
             'hero_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:5120',
             'navbar_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:5120',
         ]);

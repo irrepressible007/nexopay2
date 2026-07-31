@@ -1,7 +1,7 @@
 import '../css/app.css';
 import './bootstrap';
 
-import { createInertiaApp, usePage } from '@inertiajs/react';
+import { createInertiaApp, usePage, router } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { Toaster, toast } from 'react-hot-toast';
@@ -10,6 +10,15 @@ import { useEffect } from 'react';
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 import CursorGlow from './Components/CursorGlow';
+
+// Track Meta Pixel PageView on Inertia SPA navigation
+if (typeof window !== 'undefined') {
+    router.on('navigate', () => {
+        if (window.fbq) {
+            window.fbq('track', 'PageView');
+        }
+    });
+}
 
 // Wrapper to intercept flash messages and show toasts
 const AppWrapper = ({ App, props }) => {

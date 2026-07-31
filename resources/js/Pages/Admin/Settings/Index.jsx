@@ -26,6 +26,7 @@ export default function SettingsIndex({ auth, siteSettings = {} }) {
         contact_address: siteSettings.contact_address || '123 Vice City Blvd, Neon District',
         contact_phone: siteSettings.contact_phone || '+1 (555) 123-4567',
         contact_email: siteSettings.contact_email || 'contact@nexopay.com',
+        meta_pixel_id: siteSettings.meta_pixel_id || '',
     });
 
     const submit = (e) => {
@@ -110,6 +111,28 @@ export default function SettingsIndex({ auth, siteSettings = {} }) {
                                     />
                                     <p className="text-xs text-gray-500 mt-2">Upload a high-quality background image. It will be darkened automatically so text remains readable.</p>
                                     <InputError message={errors.hero_image} className="mt-2" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Marketing & Tracking Configuration */}
+                        <div className="bg-[#0f172a]/60 backdrop-blur-md overflow-hidden shadow-2xl sm:rounded-3xl border border-white/10 p-8">
+                            <h3 className="text-2xl font-bold text-white mb-6 border-b border-white/10 pb-4">Marketing & Pixel Tracking</h3>
+                            <div className="grid grid-cols-1 gap-6">
+                                <div>
+                                    <InputLabel htmlFor="meta_pixel_id" value="Meta (Facebook) Pixel ID" className="text-gray-300" />
+                                    <TextInput
+                                        id="meta_pixel_id"
+                                        type="text"
+                                        placeholder="e.g. 1234567890123456"
+                                        className="mt-1 block w-full font-mono text-sm"
+                                        value={data.meta_pixel_id}
+                                        onChange={(e) => setData('meta_pixel_id', e.target.value)}
+                                    />
+                                    <p className="text-xs text-gray-400 mt-2">
+                                        Enter your 15-16 digit Meta Pixel ID from Events Manager. Standard <code className="text-indigo-400">PageView</code>, <code className="text-indigo-400">InitiateCheckout</code>, <code className="text-indigo-400">Lead</code>, and <code className="text-indigo-400">CompleteRegistration</code> events will automatically be tracked.
+                                    </p>
+                                    <InputError message={errors.meta_pixel_id} className="mt-2" />
                                 </div>
                             </div>
                         </div>

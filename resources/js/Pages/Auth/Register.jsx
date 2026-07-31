@@ -17,6 +17,11 @@ export default function Register() {
         e.preventDefault();
 
         post(route('register'), {
+            onSuccess: () => {
+                if (typeof window !== 'undefined' && window.fbq) {
+                    window.fbq('track', 'Lead');
+                }
+            },
             onFinish: () => reset('password', 'password_confirmation'),
         });
     };

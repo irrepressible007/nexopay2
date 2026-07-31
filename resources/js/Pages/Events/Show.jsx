@@ -201,8 +201,19 @@ export default function Show({ auth, event }) {
     };
 
     const submit = (e) => {
-        e.preventDefault();
-        post(route('event.register', event.slug));
+        if (e && e.preventDefault) e.preventDefault();
+        post(route('event.register', event.slug), {
+            onSuccess: () => {
+                if (typeof window !== 'undefined' && window.fbq) {
+                    window.fbq('track', 'CompleteRegistration', {
+                        content_name: event.title,
+                        value: totalPrice || 0,
+                        currency: 'BDT',
+                        status: 'completed'
+                    });
+                }
+            }
+        });
     };
 
     const handleNextStep = (e, targetStep) => {
@@ -210,6 +221,14 @@ export default function Show({ auth, event }) {
         if (form && !form.checkValidity()) {
             form.reportValidity();
             return;
+        }
+
+        if (typeof window !== 'undefined' && window.fbq) {
+            window.fbq('track', 'InitiateCheckout', {
+                content_name: event.title,
+                value: totalPrice || 0,
+                currency: 'BDT'
+            });
         }
 
         if (targetStep === 2) {
