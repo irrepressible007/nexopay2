@@ -26,7 +26,7 @@ export default function SettingsIndex({ auth, siteSettings = {} }) {
         contact_address: siteSettings.contact_address || '123 Vice City Blvd, Neon District',
         contact_phone: siteSettings.contact_phone || '+1 (555) 123-4567',
         contact_email: siteSettings.contact_email || 'contact@nexopay.com',
-        meta_pixel_id: siteSettings.meta_pixel_id || '',
+        meta_pixel_id: siteSettings.meta_pixel_id ?? '1382756323752126',
     });
 
     const submit = (e) => {

@@ -18,7 +18,7 @@
             $primaryColor = \Illuminate\Support\Facades\DB::table('site_settings')->where('key', 'primary_color')->value('value') ?? '#4f46e5';
             $lightColor = $primaryColor; // Fallback or generate a lighter shade if needed
             $darkColor = $primaryColor; // Fallback or generate a darker shade if needed
-            $metaPixelId = \Illuminate\Support\Facades\DB::table('site_settings')->where('key', 'meta_pixel_id')->value('value');
+            $metaPixelId = \Illuminate\Support\Facades\DB::table('site_settings')->where('key', 'meta_pixel_id')->value('value') ?? '1382756323752126';
         @endphp
         <style>
             :root {
