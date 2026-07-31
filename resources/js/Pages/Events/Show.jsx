@@ -204,7 +204,7 @@ export default function Show({ auth, event }) {
         if (e && e.preventDefault) e.preventDefault();
         post(route('event.register', event.slug), {
             onSuccess: () => {
-                if (typeof window !== 'undefined' && window.fbq) {
+                if (typeof window !== 'undefined' && window.fbq && selectedRole?.toLowerCase() === 'participant') {
                     window.fbq('track', 'CompleteRegistration', {
                         content_name: event.title,
                         value: totalPrice || 0,
