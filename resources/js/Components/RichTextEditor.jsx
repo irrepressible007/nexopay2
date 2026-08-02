@@ -59,34 +59,44 @@ export default function RichTextEditor({ value, onChange, className = '', placeh
             const formData = new FormData();
             formData.append('image', file);
 
-            try {
-                // Determine the quill instance
-                const quill = this.quill; 
-                const range = quill.getSelection();
+            const quill = this.quill;
+            const range = quill.getSelection() || { index: quill.getLength() };
+            const placeholder = 'Uploading image...';
+            let insertedIndex = range.index;
 
-                // Show a loading indicator (optional but good UX)
-                quill.insertText(range.index, 'Uploading image...', 'italic', true);
+            try {
+                // Show a loading indicator
+                quill.insertText(insertedIndex, placeholder, { italic: true });
 
                 const response = await fetch('/api/upload-image', {
                     method: 'POST',
                     headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
                     },
                     body: formData
                 });
 
-                const data = await response.json();
-                
-                quill.deleteText(range.index, 18); // remove 'Uploading image...'
+                const data = await response.json().catch(() => ({ error: 'Invalid response from server' }));
+
+                // Remove placeholder text
+                try {
+                    quill.deleteText(insertedIndex, placeholder.length);
+                } catch (e) {}
 
                 if (response.ok && data.url) {
-                    quill.insertEmbed(range.index, 'image', data.url);
+                    quill.insertEmbed(insertedIndex, 'image', data.url);
+                    quill.setSelection(insertedIndex + 1);
                 } else {
-                    alert(data.error || 'Upload failed');
+                    alert(data.error || data.message || 'Image upload failed.');
                 }
             } catch (error) {
                 console.error('Image upload failed:', error);
-                alert('An error occurred during upload.');
+                try {
+                    quill.deleteText(insertedIndex, placeholder.length);
+                } catch (e) {}
+                alert('An error occurred during upload. Please check your image format and file size.');
             }
         };
     }

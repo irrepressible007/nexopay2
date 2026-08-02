@@ -37,7 +37,7 @@ Route::middleware('auth')->group(function () {
     
 });
 
-Route::middleware(['auth', 'is_admin'])->group(function () {
+Route::middleware(['auth', 'has_dashboard_access'])->group(function () {
     Route::post('/api/upload-image', [\App\Http\Controllers\ImageUploadController::class, 'store'])->name('api.upload.image');
 });
 
