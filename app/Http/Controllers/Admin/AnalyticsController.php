@@ -57,13 +57,13 @@ class AnalyticsController extends Controller
             }
         }
 
-        $stats['total_registrations'] = $registrations->count();
-        $stats['approved_registrations'] = $registrations->where('status', 'approved')->count();
-        $stats['pending_registrations'] = $registrations->where('status', 'pending')->count();
-        $stats['rejected_registrations'] = $registrations->where('status', 'rejected')->count();
+        $stats['total_registrations'] = (int) $registrations->count();
+        $stats['approved_registrations'] = (int) $registrations->where('status', 'approved')->count();
+        $stats['pending_registrations'] = (int) $registrations->where('status', 'pending')->count();
+        $stats['rejected_registrations'] = (int) $registrations->where('status', 'rejected')->count();
         
         // Revenue is calculated only from approved registrations
-        $stats['total_revenue'] = $registrations->where('status', 'approved')->sum('payable_amount');
+        $stats['total_revenue'] = (float) $registrations->where('status', 'approved')->sum('payable_amount');
 
         // Group by Role
         $roleBreakdown = $registrations->groupBy(function($reg) {
@@ -73,8 +73,8 @@ class AnalyticsController extends Controller
         foreach ($roleBreakdown as $roleName => $regs) {
             $stats['registrations_by_role'][] = [
                 'role' => $roleName,
-                'count' => $regs->count(),
-                'revenue' => $regs->where('status', 'approved')->sum('payable_amount'),
+                'count' => (int) $regs->count(),
+                'revenue' => (float) $regs->where('status', 'approved')->sum('payable_amount'),
             ];
         }
 

@@ -5,21 +5,25 @@ import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 
 const getSelectedSegmentsList = (selectedSegments, eventSegments) => {
-    if (!selectedSegments || !eventSegments || eventSegments.length === 0) return [];
+    if (!selectedSegments || !eventSegments) return [];
     
     let parsedSegments = selectedSegments;
     if (typeof selectedSegments === 'string') {
-        try {
-            parsedSegments = JSON.parse(selectedSegments);
-        } catch (e) {
-            return [];
-        }
+        try { parsedSegments = JSON.parse(selectedSegments); } catch (e) { return []; }
     }
+
+    let parsedEventSegments = eventSegments;
+    if (typeof eventSegments === 'string') {
+        try { parsedEventSegments = JSON.parse(eventSegments); } catch (e) { return []; }
+    }
+
+    if (!parsedSegments || typeof parsedSegments !== 'object' || !Array.isArray(parsedEventSegments)) return [];
 
     const list = [];
     const optionsMap = parsedSegments.__options || {};
 
-    eventSegments.forEach(seg => {
+    parsedEventSegments.forEach(seg => {
+        if (!seg || !seg.id) return;
         const selection = parsedSegments[seg.id];
         if (!selection) return;
 
@@ -30,10 +34,11 @@ const getSelectedSegmentsList = (selectedSegments, eventSegments) => {
                 price: seg.global_price || 0
             });
         } else {
+            const subSegments = seg.sub_segments || [];
             const selectedSubIds = Array.isArray(selection) ? selection : [selection];
             
             selectedSubIds.forEach(subId => {
-                const sub = (seg.sub_segments || []).find(s => s.id == subId);
+                const sub = (Array.isArray(subSegments) ? subSegments : []).find(s => s && s.id == subId);
                 if (!sub) return;
 
                 if (!sub.has_options || sub.pricing_mode === 'global') {
@@ -45,9 +50,10 @@ const getSelectedSegmentsList = (selectedSegments, eventSegments) => {
                 } else {
                     const subOptions = optionsMap[sub.id] || [];
                     const selectedOptIds = Array.isArray(subOptions) ? subOptions : [subOptions];
+                    const optionsList = sub.options || [];
                     
                     selectedOptIds.forEach(optId => {
-                        const opt = (sub.options || []).find(o => o.id == optId);
+                        const opt = (Array.isArray(optionsList) ? optionsList : []).find(o => o && o.id == optId);
                         if (!opt) return;
                         
                         list.push({
@@ -64,27 +70,50 @@ const getSelectedSegmentsList = (selectedSegments, eventSegments) => {
     return list;
 };
 
-const getSegmentFilterOptions = (eventsList, selectedEventId) => {
+const getSegmentFilterOptions = (eventsList = [], selectedEventId) => {
     const options = [];
-    const targetEvents = selectedEventId ? eventsList.filter(e => e.id == selectedEventId) : eventsList;
+    if (!Array.isArray(eventsList)) return [];
+
+    const targetEvents = selectedEventId ? eventsList.filter(e => e && e.id == selectedEventId) : eventsList;
     
     targetEvents.forEach(ev => {
-        const segments = ev.segments || [];
+        if (!ev) return;
+        let segments = ev.segments || [];
+        if (typeof segments === 'string') {
+            try { segments = JSON.parse(segments); } catch(e) { segments = []; }
+        }
+        if (!Array.isArray(segments)) return;
+
         segments.forEach(seg => {
+            if (!seg) return;
             if (seg.pricing_mode === 'global') {
                 options.push({
                     key: seg.id,
                     label: targetEvents.length > 1 ? `[${ev.title}] ${seg.title}` : seg.title,
                 });
             } else {
-                (seg.sub_segments || []).forEach(sub => {
+                let subSegments = seg.sub_segments || [];
+                if (typeof subSegments === 'string') {
+                    try { subSegments = JSON.parse(subSegments); } catch(e) { subSegments = []; }
+                }
+                if (!Array.isArray(subSegments)) return;
+
+                subSegments.forEach(sub => {
+                    if (!sub) return;
                     if (!sub.has_options || sub.pricing_mode === 'global') {
                         options.push({
                             key: sub.id,
                             label: targetEvents.length > 1 ? `[${ev.title}] ${seg.title} → ${sub.title}` : `${seg.title} → ${sub.title}`,
                         });
                     } else {
-                        (sub.options || []).forEach(opt => {
+                        let optionsList = sub.options || [];
+                        if (typeof optionsList === 'string') {
+                            try { optionsList = JSON.parse(optionsList); } catch(e) { optionsList = []; }
+                        }
+                        if (!Array.isArray(optionsList)) return;
+
+                        optionsList.forEach(opt => {
+                            if (!opt) return;
                             options.push({
                                 key: opt.id,
                                 label: targetEvents.length > 1 ? `[${ev.title}] ${seg.title} → ${sub.title} (${opt.title})` : `${seg.title} → ${sub.title} (${opt.title})`,
