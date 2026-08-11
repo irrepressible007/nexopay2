@@ -21,6 +21,8 @@ export default function TicketPrintModal({ show, onClose, registration, getSelec
     const name = registration.user ? registration.user.name : (registration.guest_name || 'N/A');
     const formData = registration.form_data || {};
 
+    const eventLogo = registration.event ? registration.event.cover_image : null;
+
     const instituteName = extractField(formData, ['institute', 'institution', 'school', 'college', 'varsity', 'organization']) || 'N/A';
     const className = extractField(formData, ['class', 'grade', 'level']) || 'N/A';
     const categoryName = extractField(formData, ['category', 'group', 'division']) || registration.role?.name || 'Participant';
@@ -57,20 +59,31 @@ export default function TicketPrintModal({ show, onClose, registration, getSelec
                 <div id="printable-ticket-wrapper" className="w-full flex justify-center py-4 bg-gray-100 dark:bg-gray-800 rounded-xl print:p-0 print:bg-white print:w-auto">
                     <div 
                         id="printable-ticket"
-                        className="bg-white text-black p-3 rounded-lg shadow-md print:shadow-none border border-gray-300 print:border-none font-sans"
+                        className="bg-white text-black p-3 rounded-lg shadow-md print:shadow-none border border-gray-300 print:border-none font-sans flex flex-col items-center text-center"
                         style={{
                             width: '2.2in', // Exactly 2 inches printable width with padding fit
                             minHeight: '3.2in',
                             boxSizing: 'border-box'
                         }}
                     >
-                        {/* Event Title / Logo Header */}
-                        <div className="text-center mb-3">
-                            <div className="text-base font-black tracking-tight leading-tight uppercase text-black border-b-2 border-black pb-1 mb-1">
+                        {/* Event Logo Header */}
+                        {eventLogo && (
+                            <div className="mb-2 flex justify-center w-full">
+                                <img 
+                                    src={eventLogo} 
+                                    alt={eventTitle} 
+                                    className="max-h-16 max-w-[1.8in] object-contain mx-auto" 
+                                />
+                            </div>
+                        )}
+
+                        {/* Event Title / Header */}
+                        <div className="text-center w-full mb-3">
+                            <div className="text-sm font-black tracking-tight leading-tight uppercase text-black border-b-2 border-black pb-1 mb-1">
                                 {eventTitle}
                             </div>
                             {/* Category Title */}
-                            <div className="text-sm font-extrabold text-black uppercase tracking-wider">
+                            <div className="text-sm font-black text-black uppercase tracking-wider">
                                 {categoryName}
                             </div>
                         </div>

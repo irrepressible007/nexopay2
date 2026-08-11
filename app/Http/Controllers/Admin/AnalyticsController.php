@@ -19,7 +19,7 @@ class AnalyticsController extends Controller
         $roleId = $request->input('role_id');
         $segmentKey = $request->input('segment_key');
         
-        $events = Event::select('id', 'title', 'status', 'segments')->latest()->get();
+        $events = Event::select('id', 'title', 'status', 'segments', 'cover_image')->latest()->get();
         $roles = Role::select('id', 'name')->get();
 
         $stats = [
