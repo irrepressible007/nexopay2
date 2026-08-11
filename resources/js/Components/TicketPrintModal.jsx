@@ -71,12 +71,12 @@ export default function TicketPrintModal({ show, onClose, registration, getSelec
             </div>
 
             {/* Ticket Form Fields */}
-            <div className="w-full space-y-2 text-[11px] mt-1">
+            <div className="w-full space-y-2 text-[11px] mt-1 grow flex flex-col justify-start">
                 {/* Name */}
-                <div className="flex items-center gap-1 w-full">
-                    <div className="w-[65px] text-left font-bold text-black shrink-0">Name</div>
+                <div className="flex items-start gap-1 w-full">
+                    <div className="w-[65px] text-left font-bold text-black shrink-0 leading-tight">Name</div>
                     <div className="text-black font-bold">:</div>
-                    <div className="grow border-2 border-black rounded-lg px-2 py-1 font-bold text-black bg-white text-left truncate text-xs">
+                    <div className="grow border-2 border-black rounded-lg px-2 py-1 font-bold text-black bg-white text-left break-words leading-snug text-xs">
                         {name}
                     </div>
                 </div>
@@ -85,25 +85,25 @@ export default function TicketPrintModal({ show, onClose, registration, getSelec
                 <div className="flex items-start gap-1 w-full">
                     <div className="w-[65px] text-left font-bold text-black shrink-0 leading-tight">Institute Name</div>
                     <div className="text-black font-bold">:</div>
-                    <div className="grow border-2 border-black rounded-lg px-2 py-1 font-semibold text-black bg-white text-left leading-tight min-h-[36px] break-words text-[10px]">
+                    <div className="grow border-2 border-black rounded-lg px-2 py-1 font-semibold text-black bg-white text-left leading-tight break-words text-[10px]">
                         {instituteName}
                     </div>
                 </div>
 
                 {/* Class */}
-                <div className="flex items-center gap-1 w-full">
-                    <div className="w-[65px] text-left font-bold text-black shrink-0">Class</div>
+                <div className="flex items-start gap-1 w-full">
+                    <div className="w-[65px] text-left font-bold text-black shrink-0 leading-tight">Class</div>
                     <div className="text-black font-bold">:</div>
-                    <div className="grow border-2 border-black rounded-lg px-2 py-1 font-semibold text-black bg-white text-left truncate text-xs">
+                    <div className="grow border-2 border-black rounded-lg px-2 py-1 font-semibold text-black bg-white text-left break-words leading-snug text-xs">
                         {className}
                     </div>
                 </div>
 
                 {/* Segments Box */}
-                <div className="flex items-start gap-1 w-full">
-                    <div className="w-[65px] text-left font-bold text-black shrink-0">Segments</div>
+                <div className="flex items-start gap-1 w-full grow">
+                    <div className="w-[65px] text-left font-bold text-black shrink-0 leading-tight">Segments</div>
                     <div className="text-black font-bold">:</div>
-                    <div className="grow border-2 border-black rounded-lg p-1.5 font-semibold text-black bg-white text-left min-h-[70px] max-h-[110px] overflow-hidden text-[10px]">
+                    <div className="grow border-2 border-black rounded-lg p-1.5 font-semibold text-black bg-white text-left min-h-[80px] grow text-[10px] break-words">
                         {segmentsList.length > 0 ? (
                             <ul className="list-disc list-inside space-y-0.5">
                                 {segmentsList.map((item, i) => (
