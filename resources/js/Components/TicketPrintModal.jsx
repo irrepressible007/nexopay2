@@ -39,7 +39,7 @@ export default function TicketPrintModal({ show, onClose, registration, getSelec
     const ticketContent = (
         <div 
             id="printable-ticket"
-            className="bg-white text-black p-3 font-sans flex flex-col justify-start items-center text-center box-border border-2 border-black rounded-xl"
+            className="bg-white text-black p-2.5 font-sans flex flex-col justify-start items-center text-center box-border border-2 border-black rounded-xl"
             style={{
                 width: '2in',
                 height: '5in',
@@ -48,20 +48,20 @@ export default function TicketPrintModal({ show, onClose, registration, getSelec
                 overflow: 'hidden'
             }}
         >
-            {/* Event Logo Header */}
+            {/* Event Logo Header - Prominent & Bigger */}
             {eventLogo && (
-                <div className="mb-2 flex justify-center w-full">
+                <div className="mb-1.5 flex justify-center w-full shrink-0">
                     <img 
                         src={eventLogo} 
                         alt={eventTitle} 
-                        className="max-h-20 max-w-[1.7in] object-contain mx-auto" 
+                        className="max-h-28 max-w-[1.85in] object-contain mx-auto" 
                     />
                 </div>
             )}
 
             {/* Event Title / Header */}
-            <div className="text-center w-full mb-3">
-                <div className="text-xs font-black tracking-tight leading-tight uppercase text-black border-b-2 border-black pb-1 mb-1">
+            <div className="text-center w-full mb-2 shrink-0">
+                <div className="text-[11px] font-black tracking-tight leading-tight uppercase text-black border-b border-black pb-0.5 mb-1">
                     {eventTitle}
                 </div>
                 {/* Category Title */}
@@ -71,39 +71,39 @@ export default function TicketPrintModal({ show, onClose, registration, getSelec
             </div>
 
             {/* Ticket Form Fields */}
-            <div className="w-full space-y-2 text-[11px] mt-1 grow flex flex-col justify-start">
+            <div className="w-full space-y-1.5 text-[10px] mt-0.5 grow flex flex-col justify-start overflow-hidden">
                 {/* Name */}
-                <div className="flex items-start gap-1 w-full">
-                    <div className="w-[65px] text-left font-bold text-black shrink-0 leading-tight">Name</div>
+                <div className="flex items-start gap-1 w-full shrink-0">
+                    <div className="w-[58px] text-left font-bold text-black shrink-0 leading-tight">Name</div>
                     <div className="text-black font-bold">:</div>
-                    <div className="grow border-2 border-black rounded-lg px-2 py-1 font-bold text-black bg-white text-left break-words leading-snug text-xs">
+                    <div className="grow border-2 border-black rounded-lg px-1.5 py-0.5 font-bold text-black bg-white text-left break-words leading-snug text-[11px]">
                         {name}
                     </div>
                 </div>
 
                 {/* Institute Name */}
-                <div className="flex items-start gap-1 w-full">
-                    <div className="w-[65px] text-left font-bold text-black shrink-0 leading-tight">Institute Name</div>
+                <div className="flex items-start gap-1 w-full shrink-0">
+                    <div className="w-[58px] text-left font-bold text-black shrink-0 leading-tight">Institute Name</div>
                     <div className="text-black font-bold">:</div>
-                    <div className="grow border-2 border-black rounded-lg px-2 py-1 font-semibold text-black bg-white text-left leading-tight break-words text-[10px]">
+                    <div className="grow border-2 border-black rounded-lg px-1.5 py-0.5 font-semibold text-black bg-white text-left leading-tight break-words text-[10px]">
                         {instituteName}
                     </div>
                 </div>
 
                 {/* Class */}
-                <div className="flex items-start gap-1 w-full">
-                    <div className="w-[65px] text-left font-bold text-black shrink-0 leading-tight">Class</div>
+                <div className="flex items-start gap-1 w-full shrink-0">
+                    <div className="w-[58px] text-left font-bold text-black shrink-0 leading-tight">Class</div>
                     <div className="text-black font-bold">:</div>
-                    <div className="grow border-2 border-black rounded-lg px-2 py-1 font-semibold text-black bg-white text-left break-words leading-snug text-xs">
+                    <div className="grow border-2 border-black rounded-lg px-1.5 py-0.5 font-semibold text-black bg-white text-left break-words leading-snug text-[10px]">
                         {className}
                     </div>
                 </div>
 
                 {/* Segments Box */}
-                <div className="flex items-start gap-1 w-full grow">
-                    <div className="w-[65px] text-left font-bold text-black shrink-0 leading-tight">Segments</div>
+                <div className="flex items-start gap-1 w-full grow overflow-hidden">
+                    <div className="w-[58px] text-left font-bold text-black shrink-0 leading-tight">Segments</div>
                     <div className="text-black font-bold">:</div>
-                    <div className="grow border-2 border-black rounded-lg p-1.5 font-semibold text-black bg-white text-left min-h-[80px] grow text-[10px] break-words">
+                    <div className="grow border-2 border-black rounded-lg p-1 font-semibold text-black bg-white text-left min-h-[60px] grow text-[9.5px] break-words overflow-hidden">
                         {segmentsList.length > 0 ? (
                             <ul className="list-disc list-inside space-y-0.5">
                                 {segmentsList.map((item, i) => (
