@@ -64,31 +64,107 @@ const getSelectedSegmentsList = (selectedSegments, eventSegments) => {
     return list;
 };
 
-export default function AnalyticsIndex({ auth, events, roles = [], selectedEventId, selectedRoleId, stats, registrations = [], dynamicColumns = [] }) {
+const getSegmentFilterOptions = (eventsList, selectedEventId) => {
+    const options = [];
+    const targetEvents = selectedEventId ? eventsList.filter(e => e.id == selectedEventId) : eventsList;
+    
+    targetEvents.forEach(ev => {
+        const segments = ev.segments || [];
+        segments.forEach(seg => {
+            if (seg.pricing_mode === 'global') {
+                options.push({
+                    key: seg.id,
+                    label: targetEvents.length > 1 ? `[${ev.title}] ${seg.title}` : seg.title,
+                });
+            } else {
+                (seg.sub_segments || []).forEach(sub => {
+                    if (!sub.has_options || sub.pricing_mode === 'global') {
+                        options.push({
+                            key: sub.id,
+                            label: targetEvents.length > 1 ? `[${ev.title}] ${seg.title} → ${sub.title}` : `${seg.title} → ${sub.title}`,
+                        });
+                    } else {
+                        (sub.options || []).forEach(opt => {
+                            options.push({
+                                key: opt.id,
+                                label: targetEvents.length > 1 ? `[${ev.title}] ${seg.title} → ${sub.title} (${opt.title})` : `${seg.title} → ${sub.title} (${opt.title})`,
+                            });
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+    return options;
+};
+
+const matchesSegmentKey = (reg, key) => {
+    if (!key) return true;
+    let sel = reg.selected_segments;
+    if (!sel) return false;
+    if (typeof sel === 'string') {
+        try { sel = JSON.parse(sel); } catch(e) { return false; }
+    }
+    if (!sel || typeof sel !== 'object') return false;
+
+    if (sel[key]) return true;
+
+    for (const segId in sel) {
+        if (segId === '__options') continue;
+        const val = sel[segId];
+        if (Array.isArray(val) && val.includes(key)) return true;
+        if (typeof val === 'string' && val === key) return true;
+    }
+
+    if (sel.__options) {
+        for (const subId in sel.__options) {
+            const optVal = sel.__options[subId];
+            if (Array.isArray(optVal) && optVal.includes(key)) return true;
+            if (typeof optVal === 'string' && optVal === key) return true;
+        }
+    }
+
+    return false;
+};
+
+export default function AnalyticsIndex({ auth, events = [], roles = [], selectedEventId, selectedRoleId, selectedSegmentKey, stats, registrations = [], dynamicColumns = [] }) {
     const [eventId, setEventId] = useState(selectedEventId || '');
     const [roleId, setRoleId] = useState(selectedRoleId || '');
+    const [segmentKey, setSegmentKey] = useState(selectedSegmentKey || '');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedParticipant, setSelectedParticipant] = useState(null);
 
     const selectedRole = roles.find(r => r.id == roleId);
     const isParticipantFiltered = selectedRole && selectedRole.name.toLowerCase() === 'participant';
 
-    const handleFilterChange = (newEventId, newRoleId) => {
+    const segmentOptions = getSegmentFilterOptions(events, eventId);
+
+    const handleFilterChange = (newEventId, newRoleId, newSegmentKey) => {
         setEventId(newEventId);
         setRoleId(newRoleId);
-        router.get(route('admin.analytics.index'), { event_id: newEventId, role_id: newRoleId }, { preserveState: true, preserveScroll: true });
+        setSegmentKey(newSegmentKey);
+        router.get(
+            route('admin.analytics.index'), 
+            { event_id: newEventId, role_id: newRoleId, segment_key: newSegmentKey }, 
+            { preserveState: true, preserveScroll: true }
+        );
     };
 
     const handleExportSummary = () => {
-        window.location.href = route('admin.analytics.export.summary', { event_id: eventId, role_id: roleId });
+        window.location.href = route('admin.analytics.export.summary', { event_id: eventId, role_id: roleId, segment_key: segmentKey });
     };
 
     const handleExportDetailed = () => {
-        window.location.href = route('admin.analytics.export.detailed', { event_id: eventId, role_id: roleId });
+        window.location.href = route('admin.analytics.export.detailed', { event_id: eventId, role_id: roleId, segment_key: segmentKey });
     };
 
-    // Filter registrations by search term
+    // Filter registrations by segment key and search term
     const filteredRegistrations = registrations.filter(reg => {
+        if (segmentKey && !matchesSegmentKey(reg, segmentKey)) {
+            return false;
+        }
+
         if (!searchTerm) return true;
         const term = searchTerm.toLowerCase();
         
@@ -111,6 +187,13 @@ export default function AnalyticsIndex({ auth, events, roles = [], selectedEvent
                 }
             }
         }
+
+        // Search inside selected segment titles
+        const userSegList = getSelectedSegmentsList(reg.selected_segments, reg.event?.segments || []);
+        for (const item of userSegList) {
+            const segStr = `${item.segmentName} ${item.selectionText}`.toLowerCase();
+            if (segStr.includes(term)) return true;
+        }
         
         return false;
     });
@@ -127,13 +210,13 @@ export default function AnalyticsIndex({ auth, events, roles = [], selectedEvent
                     
                     {/* Header / Filter Area */}
                     <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div className="flex-1 w-full md:w-auto flex flex-col sm:flex-row gap-4">
+                        <div className="flex-1 w-full md:w-auto flex flex-col sm:flex-row gap-4 flex-wrap">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filter by Event</label>
                                 <select 
                                     value={eventId}
-                                    onChange={(e) => handleFilterChange(e.target.value, roleId)}
-                                    className="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full sm:w-64"
+                                    onChange={(e) => handleFilterChange(e.target.value, roleId, segmentKey)}
+                                    className="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full sm:w-56"
                                 >
                                     <option value="">Global (All Events)</option>
                                     {events.map(ev => (
@@ -142,17 +225,42 @@ export default function AnalyticsIndex({ auth, events, roles = [], selectedEvent
                                 </select>
                             </div>
 
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filter by Segment</label>
+                                <select 
+                                    value={segmentKey}
+                                    onChange={(e) => handleFilterChange(eventId, roleId, e.target.value)}
+                                    className="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full sm:w-64"
+                                >
+                                    <option value="">All Segments</option>
+                                    {segmentOptions.map(opt => (
+                                        <option key={opt.key} value={opt.key}>{opt.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {(eventId || roleId || segmentKey) && (
+                                <div className="flex items-end">
+                                    <button
+                                        onClick={() => handleFilterChange('', '', '')}
+                                        className="text-xs text-red-600 dark:text-red-400 hover:underline font-semibold pb-2"
+                                    >
+                                        Clear All Filters
+                                    </button>
+                                </div>
+                            )}
+
                         </div>
                         <div className="flex gap-3 w-full md:w-auto justify-end">
                             <button 
                                 onClick={handleExportSummary}
-                                className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold shadow transition"
+                                className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold shadow transition text-sm"
                             >
                                 Download Summary CSV
                             </button>
                             <button 
                                 onClick={handleExportDetailed}
-                                className="bg-gray-800 dark:bg-gray-700 hover:bg-gray-900 dark:hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold shadow transition"
+                                className="bg-gray-800 dark:bg-gray-700 hover:bg-gray-900 dark:hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold shadow transition text-sm"
                             >
                                 Download Detailed CSV
                             </button>
@@ -268,7 +376,7 @@ export default function AnalyticsIndex({ auth, events, roles = [], selectedEvent
                             <div className="flex flex-col sm:flex-row gap-3 items-center">
                                 <select 
                                     value={roleId}
-                                    onChange={(e) => handleFilterChange(eventId, e.target.value)}
+                                    onChange={(e) => handleFilterChange(eventId, e.target.value, segmentKey)}
                                     className="border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full sm:w-48 capitalize"
                                 >
                                     <option value="">All Roles</option>
@@ -295,7 +403,7 @@ export default function AnalyticsIndex({ auth, events, roles = [], selectedEvent
                                         <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Status</th>
                                         <th scope="col" className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">TxID / Sender</th>
                                         <th scope="col" className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">Amount</th>
-                                        {isParticipantFiltered && (
+                                        {(isParticipantFiltered || segmentKey || eventId) && (
                                             <th scope="col" className="px-4 py-3 text-left font-semibold text-teal-700 dark:text-teal-400 border-l border-gray-200 dark:border-gray-700">
                                                 Participating Segments
                                             </th>
@@ -342,7 +450,7 @@ export default function AnalyticsIndex({ auth, events, roles = [], selectedEvent
                                                 <td className="px-4 py-3 text-gray-600 dark:text-gray-400 font-semibold">
                                                     ৳{reg.payable_amount}
                                                 </td>
-                                                {isParticipantFiltered && (
+                                                {(isParticipantFiltered || segmentKey || eventId) && (
                                                     <td className="px-4 py-3 text-gray-600 dark:text-gray-400 border-l border-gray-100 dark:border-gray-800 max-w-[250px] truncate" title={
                                                         getSelectedSegmentsList(reg.selected_segments, reg.event?.segments)
                                                             .map(item => `${item.segmentName} (${item.selectionText})`)

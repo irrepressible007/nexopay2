@@ -37,6 +37,7 @@ class CheckInController extends Controller
             'progress_status' => 'Checked In'
         ]);
 
-        return back()->with('success', "Success! {$registration->user->name} ({$registration->role->name}) has been checked in for {$registration->event->title}.");
+        $attendeeName = $registration->user?->name ?? $registration->guest_name ?? 'Guest';
+        return back()->with('success', "Success! {$attendeeName} ({$registration->role->name}) has been checked in for {$registration->event->title}.");
     }
 }

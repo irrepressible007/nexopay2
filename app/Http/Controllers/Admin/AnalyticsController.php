@@ -17,8 +17,9 @@ class AnalyticsController extends Controller
     {
         $eventId = $request->input('event_id');
         $roleId = $request->input('role_id');
+        $segmentKey = $request->input('segment_key');
         
-        $events = Event::select('id', 'title', 'status')->latest()->get();
+        $events = Event::select('id', 'title', 'status', 'segments')->latest()->get();
         $roles = Role::select('id', 'name')->get();
 
         $stats = [
@@ -82,6 +83,7 @@ class AnalyticsController extends Controller
             'roles' => $roles,
             'selectedEventId' => $eventId,
             'selectedRoleId' => $roleId,
+            'selectedSegmentKey' => $segmentKey,
             'stats' => $stats,
             'registrations' => $registrations,
             'dynamicColumns' => $dynamicColumns
@@ -92,6 +94,7 @@ class AnalyticsController extends Controller
     {
         $eventId = $request->input('event_id');
         $roleId = $request->input('role_id');
+        $segmentKey = $request->input('segment_key');
         
         $query = Registration::query()->with(['role', 'event']);
         if ($eventId) {
@@ -101,6 +104,12 @@ class AnalyticsController extends Controller
             $query->where('role_id', $roleId);
         }
         $registrations = $query->get();
+
+        if ($segmentKey) {
+            $registrations = $registrations->filter(function($reg) use ($segmentKey) {
+                return $this->matchesSegment($reg, $segmentKey);
+            });
+        }
 
         $filename = "analytics_summary_" . date('Y-m-d_H-i-s') . ".csv";
 
@@ -149,6 +158,7 @@ class AnalyticsController extends Controller
     {
         $eventId = $request->input('event_id');
         $roleId = $request->input('role_id');
+        $segmentKey = $request->input('segment_key');
         
         $query = Registration::query()->with(['role', 'event', 'user']);
         if ($eventId) {
@@ -159,6 +169,13 @@ class AnalyticsController extends Controller
         }
         
         $registrations = $query->get();
+
+        if ($segmentKey) {
+            $registrations = $registrations->filter(function($reg) use ($segmentKey) {
+                return $this->matchesSegment($reg, $segmentKey);
+            });
+        }
+
         $filename = "analytics_detailed_" . date('Y-m-d_H-i-s') . ".csv";
 
         $headers = [
@@ -216,17 +233,9 @@ class AnalyticsController extends Controller
                     $row[] = $val;
                 }
 
-                // Format selected segments
-                $segments = '';
-                if (!empty($reg->selected_segments) && is_array($reg->selected_segments)) {
-                    $segArr = [];
-                    foreach ($reg->selected_segments as $k => $v) {
-                        if ($k !== '__options') {
-                            $segArr[] = "SegID:$k=" . (is_array($v) ? implode('|', $v) : $v);
-                        }
-                    }
-                    $segments = implode(', ', $segArr);
-                }
+                // Format selected segments into human readable text
+                $eventSegments = $reg->event ? ($reg->event->segments ?? []) : [];
+                $segments = $this->formatSelectedSegmentsHumanReadable($reg->selected_segments, $eventSegments);
                 $row[] = $segments;
 
                 fputcsv($file, $row);
@@ -236,5 +245,90 @@ class AnalyticsController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    private function matchesSegment($reg, $segmentKey): bool
+    {
+        if (empty($segmentKey)) return true;
+        $sel = $reg->selected_segments;
+        if (is_string($sel)) {
+            $sel = json_decode($sel, true);
+        }
+        if (!is_array($sel)) return false;
+
+        // 1. Direct segment check (global segment)
+        if (isset($sel[$segmentKey]) && !empty($sel[$segmentKey])) {
+            return true;
+        }
+
+        // 2. Sub-segment check
+        foreach ($sel as $k => $val) {
+            if ($k === '__options') continue;
+            if (is_array($val) && in_array($segmentKey, $val)) return true;
+            if (is_string($val) && $val === $segmentKey) return true;
+        }
+
+        // 3. Option check (in __options)
+        if (isset($sel['__options']) && is_array($sel['__options'])) {
+            foreach ($sel['__options'] as $subId => $optVal) {
+                if (is_array($optVal) && in_array($segmentKey, $optVal)) return true;
+                if (is_string($optVal) && $optVal === $segmentKey) return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function formatSelectedSegmentsHumanReadable($selectedSegments, array $eventSegments): string
+    {
+        if (is_string($selectedSegments)) {
+            $selectedSegments = json_decode($selectedSegments, true);
+        }
+        if (empty($selectedSegments) || !is_array($selectedSegments) || empty($eventSegments)) {
+            return '';
+        }
+
+        $list = [];
+        $optionsMap = $selectedSegments['__options'] ?? [];
+
+        foreach ($eventSegments as $seg) {
+            $segId = $seg['id'] ?? null;
+            if (!$segId || !isset($selectedSegments[$segId])) continue;
+
+            $selection = $selectedSegments[$segId];
+            if (empty($selection)) continue;
+
+            $segTitle = $seg['title'] ?? 'Segment';
+
+            if (isset($seg['pricing_mode']) && $seg['pricing_mode'] === 'global') {
+                $list[] = $segTitle;
+            } else {
+                $subSegments = $seg['sub_segments'] ?? [];
+                $selectedSubIds = is_array($selection) ? $selection : [$selection];
+
+                foreach ($selectedSubIds as $subId) {
+                    $sub = collect($subSegments)->firstWhere('id', $subId);
+                    if (!$sub) continue;
+
+                    $subTitle = $sub['title'] ?? '';
+
+                    if (empty($sub['has_options']) || (isset($sub['pricing_mode']) && $sub['pricing_mode'] === 'global')) {
+                        $list[] = $segTitle . ' -> ' . $subTitle;
+                    } else {
+                        $subOptions = $optionsMap[$sub['id']] ?? [];
+                        $selectedOptIds = is_array($subOptions) ? $subOptions : [$subOptions];
+
+                        foreach ($selectedOptIds as $optId) {
+                            $opt = collect($sub['options'] ?? [])->firstWhere('id', $optId);
+                            if (!$opt) continue;
+                            $optTitle = $opt['title'] ?? '';
+                            $list[] = $segTitle . ' -> ' . $subTitle . ' (' . $optTitle . ')';
+                        }
+                    }
+                }
+            }
+        }
+
+        return implode(' | ', $list);
     }
 }
