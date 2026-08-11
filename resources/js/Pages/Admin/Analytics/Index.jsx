@@ -157,15 +157,16 @@ const matchesSegmentKey = (reg, key) => {
     return false;
 };
 
-export default function AnalyticsIndex({ auth, events = [], roles = [], selectedEventId, selectedRoleId, selectedSegmentKey, stats, registrations = [], dynamicColumns = [] }) {
+export default function AnalyticsIndex({ auth, events = [], roles = [], selectedEventId, selectedRoleId, selectedSegmentKey, stats = {}, registrations = [], dynamicColumns = [] }) {
     const [eventId, setEventId] = useState(selectedEventId || '');
     const [roleId, setRoleId] = useState(selectedRoleId || '');
     const [segmentKey, setSegmentKey] = useState(selectedSegmentKey || '');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedParticipant, setSelectedParticipant] = useState(null);
 
-    const selectedRole = roles.find(r => r.id == roleId);
-    const isParticipantFiltered = selectedRole && selectedRole.name.toLowerCase() === 'participant';
+    const safeStats = stats || {};
+    const selectedRole = (roles || []).find(r => r && r.id == roleId);
+    const isParticipantFiltered = selectedRole && selectedRole.name && selectedRole.name.toLowerCase() === 'participant';
 
     const segmentOptions = getSegmentFilterOptions(events, eventId);
 
@@ -189,7 +190,8 @@ export default function AnalyticsIndex({ auth, events = [], roles = [], selected
     };
 
     // Filter registrations by segment key and search term
-    const filteredRegistrations = registrations.filter(reg => {
+    const filteredRegistrations = (registrations || []).filter(reg => {
+        if (!reg) return false;
         if (segmentKey && !matchesSegmentKey(reg, segmentKey)) {
             return false;
         }
@@ -197,20 +199,21 @@ export default function AnalyticsIndex({ auth, events = [], roles = [], selected
         if (!searchTerm) return true;
         const term = searchTerm.toLowerCase();
         
-        const userName = reg.user ? reg.user.name : (reg.guest_name || '');
-        const userEmail = reg.user ? reg.user.email : (reg.guest_email || '');
+        const userName = reg.user ? (reg.user.name || '') : (reg.guest_name || '');
+        const userEmail = reg.user ? (reg.user.email || '') : (reg.guest_email || '');
         const txid = reg.bkash_txid || '';
+        const status = reg.status || '';
         
         if (userName.toLowerCase().includes(term)) return true;
         if (userEmail.toLowerCase().includes(term)) return true;
         if (txid.toLowerCase().includes(term)) return true;
-        if (reg.status.toLowerCase().includes(term)) return true;
+        if (status.toLowerCase().includes(term)) return true;
 
         // Search inside dynamic form fields
-        if (reg.form_data) {
-            for (const key of dynamicColumns) {
+        if (reg.form_data && typeof reg.form_data === 'object') {
+            for (const key of (dynamicColumns || [])) {
                 const val = reg.form_data[key];
-                if (val) {
+                if (val !== undefined && val !== null) {
                     const strVal = Array.isArray(val) ? val.join(' ') : String(val);
                     if (strVal.toLowerCase().includes(term)) return true;
                 }
@@ -220,8 +223,10 @@ export default function AnalyticsIndex({ auth, events = [], roles = [], selected
         // Search inside selected segment titles
         const userSegList = getSelectedSegmentsList(reg.selected_segments, reg.event?.segments || []);
         for (const item of userSegList) {
-            const segStr = `${item.segmentName} ${item.selectionText}`.toLowerCase();
-            if (segStr.includes(term)) return true;
+            if (item && item.segmentName && item.selectionText) {
+                const segStr = `${item.segmentName} ${item.selectionText}`.toLowerCase();
+                if (segStr.includes(term)) return true;
+            }
         }
         
         return false;
@@ -248,8 +253,8 @@ export default function AnalyticsIndex({ auth, events = [], roles = [], selected
                                     className="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full sm:w-56"
                                 >
                                     <option value="">Global (All Events)</option>
-                                    {events.map(ev => (
-                                        <option key={ev.id} value={ev.id}>{ev.title}</option>
+                                    {(events || []).map(ev => (
+                                        ev && <option key={ev.id} value={ev.id}>{ev.title}</option>
                                     ))}
                                 </select>
                             </div>
@@ -300,22 +305,22 @@ export default function AnalyticsIndex({ auth, events = [], roles = [], selected
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
                         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 border-l-4 border-indigo-500">
                             <div className="text-gray-500 dark:text-gray-400 text-sm font-bold uppercase tracking-wider mb-1">Total Revenue</div>
-                            <div className="text-gray-900 dark:text-gray-100 font-black text-3xl">৳{stats.total_revenue.toLocaleString()}</div>
+                            <div className="text-gray-900 dark:text-gray-100 font-black text-3xl">৳{(safeStats.total_revenue || 0).toLocaleString()}</div>
                             <div className="text-xs text-gray-400 mt-1">From approved registrations</div>
                         </div>
                         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 border-l-4 border-blue-500">
                             <div className="text-gray-500 dark:text-gray-400 text-sm font-bold uppercase tracking-wider mb-1">Total Registrations</div>
-                            <div className="text-gray-900 dark:text-gray-100 font-black text-3xl">{stats.total_registrations}</div>
+                            <div className="text-gray-900 dark:text-gray-100 font-black text-3xl">{safeStats.total_registrations || 0}</div>
                         </div>
                         {!eventId && (
                             <>
                                 <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 border-l-4 border-purple-500">
                                     <div className="text-gray-500 dark:text-gray-400 text-sm font-bold uppercase tracking-wider mb-1">Total Users</div>
-                                    <div className="text-gray-900 dark:text-gray-100 font-black text-3xl">{stats.total_users}</div>
+                                    <div className="text-gray-900 dark:text-gray-100 font-black text-3xl">{safeStats.total_users || 0}</div>
                                 </div>
                                 <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 border-l-4 border-pink-500">
                                     <div className="text-gray-500 dark:text-gray-400 text-sm font-bold uppercase tracking-wider mb-1">Active Events</div>
-                                    <div className="text-gray-900 dark:text-gray-100 font-black text-3xl">{stats.active_events} / {stats.total_events}</div>
+                                    <div className="text-gray-900 dark:text-gray-100 font-black text-3xl">{safeStats.active_events || 0} / {safeStats.total_events || 0}</div>
                                 </div>
                             </>
                         )}
@@ -323,11 +328,11 @@ export default function AnalyticsIndex({ auth, events = [], roles = [], selected
                             <>
                                 <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 border-l-4 border-yellow-500">
                                     <div className="text-gray-500 dark:text-gray-400 text-sm font-bold uppercase tracking-wider mb-1">Pending Checkouts</div>
-                                    <div className="text-gray-900 dark:text-gray-100 font-black text-3xl">{stats.pending_registrations}</div>
+                                    <div className="text-gray-900 dark:text-gray-100 font-black text-3xl">{safeStats.pending_registrations || 0}</div>
                                 </div>
                                 <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 border-l-4 border-green-500">
                                     <div className="text-gray-500 dark:text-gray-400 text-sm font-bold uppercase tracking-wider mb-1">Approved Tickets</div>
-                                    <div className="text-gray-900 dark:text-gray-100 font-black text-3xl">{stats.approved_registrations}</div>
+                                    <div className="text-gray-900 dark:text-gray-100 font-black text-3xl">{safeStats.approved_registrations || 0}</div>
                                 </div>
                             </>
                         )}
@@ -344,19 +349,19 @@ export default function AnalyticsIndex({ auth, events = [], roles = [], selected
                                     <span className="text-gray-600 dark:text-gray-300 flex items-center gap-2">
                                         <span className="w-3 h-3 rounded-full bg-green-500"></span> Approved
                                     </span>
-                                    <span className="font-bold text-gray-900 dark:text-white">{stats.approved_registrations}</span>
+                                    <span className="font-bold text-gray-900 dark:text-white">{safeStats.approved_registrations || 0}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-gray-600 dark:text-gray-300 flex items-center gap-2">
                                         <span className="w-3 h-3 rounded-full bg-yellow-500"></span> Pending
                                     </span>
-                                    <span className="font-bold text-gray-900 dark:text-white">{stats.pending_registrations}</span>
+                                    <span className="font-bold text-gray-900 dark:text-white">{safeStats.pending_registrations || 0}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-gray-600 dark:text-gray-300 flex items-center gap-2">
                                         <span className="w-3 h-3 rounded-full bg-red-500"></span> Rejected
                                     </span>
-                                    <span className="font-bold text-gray-900 dark:text-white">{stats.rejected_registrations}</span>
+                                    <span className="font-bold text-gray-900 dark:text-white">{safeStats.rejected_registrations || 0}</span>
                                 </div>
                             </div>
                         </div>
@@ -365,7 +370,7 @@ export default function AnalyticsIndex({ auth, events = [], roles = [], selected
                         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
                             <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">Sales by Role</h3>
                             
-                            {stats.registrations_by_role.length === 0 ? (
+                            {(!safeStats.registrations_by_role || safeStats.registrations_by_role.length === 0) ? (
                                 <p className="text-gray-500">No data available yet.</p>
                             ) : (
                                 <div className="overflow-x-auto">
@@ -378,12 +383,12 @@ export default function AnalyticsIndex({ auth, events = [], roles = [], selected
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                            {stats.registrations_by_role.map((item, i) => (
+                                            {safeStats.registrations_by_role.map((item, i) => (
                                                 <tr key={i} className="text-gray-800 dark:text-gray-200">
-                                                    <td className="py-3 font-medium capitalize">{item.role}</td>
-                                                    <td className="py-3 text-right">{item.count}</td>
+                                                    <td className="py-3 font-medium capitalize">{item.role || 'Unknown'}</td>
+                                                    <td className="py-3 text-right">{item.count || 0}</td>
                                                     <td className="py-3 text-right font-bold text-indigo-600 dark:text-indigo-400">
-                                                        ৳{item.revenue.toLocaleString()}
+                                                        ৳{(item.revenue || 0).toLocaleString()}
                                                     </td>
                                                 </tr>
                                             ))}
