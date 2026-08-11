@@ -3,6 +3,7 @@ import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
+import TicketPrintModal from '@/Components/TicketPrintModal';
 
 const getSelectedSegmentsList = (selectedSegments, eventSegments) => {
     if (!selectedSegments || !eventSegments) return [];
@@ -163,6 +164,7 @@ export default function AnalyticsIndex({ auth, events = [], roles = [], selected
     const [segmentKey, setSegmentKey] = useState(selectedSegmentKey || '');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedParticipant, setSelectedParticipant] = useState(null);
+    const [ticketParticipant, setTicketParticipant] = useState(null);
 
     const safeStats = stats || {};
     const selectedRole = (roles || []).find(r => r && r.id == roleId);
@@ -449,6 +451,10 @@ export default function AnalyticsIndex({ auth, events = [], roles = [], selected
                                                 {col}
                                             </th>
                                         ))}
+
+                                        <th scope="col" className="px-4 py-3 text-center font-semibold text-indigo-700 dark:text-indigo-300 border-l border-gray-200 dark:border-gray-700 sticky right-0 bg-gray-100 dark:bg-gray-800 z-10">
+                                            Ticket
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
@@ -506,6 +512,20 @@ export default function AnalyticsIndex({ auth, events = [], roles = [], selected
                                                         </td>
                                                     );
                                                 })}
+
+                                                {/* Print Ticket Action Cell */}
+                                                <td className="px-4 py-3 text-center border-l border-gray-100 dark:border-gray-800 sticky right-0 bg-white dark:bg-gray-900 z-10" onClick={(e) => e.stopPropagation()}>
+                                                    <button
+                                                        onClick={() => setTicketParticipant(reg)}
+                                                        className="inline-flex items-center gap-1 bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 text-xs font-bold px-2.5 py-1.5 rounded-md border border-indigo-200 dark:border-indigo-800 shadow-sm transition"
+                                                        title="Print 2-inch Ticket"
+                                                    >
+                                                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H7a2 2 0 00-2 2v4h10z" />
+                                                        </svg>
+                                                        Print
+                                                    </button>
+                                                </td>
                                             </tr>
                                         ))
                                     ) : (
@@ -631,13 +651,30 @@ export default function AnalyticsIndex({ auth, events = [], roles = [], selected
                                 </div>
                             )}
 
-                            <div className="mt-6 flex justify-end">
+                            <div className="mt-6 flex justify-between items-center border-t border-gray-200 dark:border-gray-700 pt-4">
+                                <button
+                                    onClick={() => setTicketParticipant(selectedParticipant)}
+                                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm px-4 py-2 rounded-lg shadow transition flex items-center gap-2"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H7a2 2 0 00-2 2v4h10z" />
+                                    </svg>
+                                    Print Ticket (2in)
+                                </button>
                                 <SecondaryButton onClick={() => setSelectedParticipant(null)}>Close</SecondaryButton>
                             </div>
                         </div>
                     )}
                 </div>
             </Modal>
+
+            {/* Ticket Print Modal */}
+            <TicketPrintModal 
+                show={ticketParticipant !== null} 
+                onClose={() => setTicketParticipant(null)} 
+                registration={ticketParticipant} 
+                getSelectedSegmentsList={getSelectedSegmentsList} 
+            />
         </AuthenticatedLayout>
     );
 }
